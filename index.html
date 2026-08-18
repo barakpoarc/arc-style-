@@ -149,6 +149,46 @@
   .btn-restart { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 14px 32px; border-radius: 50px; font-size: 15px; font-weight: 500; font-family: 'Heebo', sans-serif; cursor: pointer; transition: all 0.2s; }
   .btn-restart:hover { border-color: #999; color: var(--text); }
 
+  /* REPORT */
+  .btn-report { background: linear-gradient(135deg, #C8956C, #9B8EA8); color: white; border: none; padding: 14px 32px; border-radius: 50px; font-size: 15px; font-weight: 500; font-family: 'Heebo', sans-serif; cursor: pointer; transition: all 0.2s; }
+  .btn-report:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
+  .report-overlay { display: none; position: fixed; inset: 0; z-index: 800; background: rgba(0,0,0,0.6); overflow-y: auto; padding: 20px; }
+  .report-overlay.open { display: block; }
+  .report-page { max-width: 760px; margin: 0 auto; background: white; border-radius: 20px; overflow: hidden; padding: 36px 32px; }
+  .report-header { text-align: center; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid #E5E0D8; }
+  .report-badge { display: inline-block; background: #F5F3F0; color: #6B6B6B; font-size: 12px; padding: 4px 14px; border-radius: 20px; margin-bottom: 10px; }
+  .report-header h2 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+  .report-header p { font-size: 13px; color: #6B6B6B; }
+  .report-winner { border-radius: 14px; padding: 24px; text-align: center; margin-bottom: 24px; color: white; }
+  .report-winner-label { font-size: 12px; opacity: 0.85; margin-bottom: 4px; }
+  .report-winner-name { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  .report-winner-pct { font-size: 14px; opacity: 0.9; }
+  .report-section-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+  .report-bars { margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid #E5E0D8; }
+  .report-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .report-bar-label { font-size: 12px; font-weight: 500; width: 150px; flex-shrink: 0; text-align: right; }
+  .report-bar-track { flex: 1; height: 8px; background: #F0EDE8; border-radius: 4px; overflow: hidden; }
+  .report-bar-fill { height: 100%; border-radius: 4px; }
+  .report-bar-pct { font-size: 12px; color: #6B6B6B; width: 32px; }
+  .report-questions { display: flex; flex-direction: column; gap: 10px; }
+  .report-q-row { display: flex; align-items: stretch; border: 1px solid #E5E0D8; border-radius: 10px; overflow: hidden; }
+  .report-q-bar { width: 4px; flex-shrink: 0; }
+  .report-q-img { width: 110px; flex-shrink: 0; object-fit: cover; display: block; }
+  .report-q-no-img { width: 110px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+  .report-q-content { flex: 1; padding: 10px 12px; }
+  .report-q-cat { font-size: 10px; color: #999; margin-bottom: 2px; }
+  .report-q-title { font-size: 12px; font-weight: 500; margin-bottom: 6px; line-height: 1.4; }
+  .report-q-chosen { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+  .report-actions { display: flex; gap: 10px; justify-content: center; margin-top: 24px; padding-top: 20px; border-top: 1px solid #E5E0D8; }
+  .report-close { background: none; border: 1px solid #E5E0D8; color: #6B6B6B; padding: 10px 24px; border-radius: 50px; font-size: 14px; font-family: 'Heebo', sans-serif; cursor: pointer; }
+  .report-print { background: #1A1A1A; color: white; border: none; padding: 10px 24px; border-radius: 50px; font-size: 14px; font-family: 'Heebo', sans-serif; cursor: pointer; }
+  @media print {
+    .report-overlay { display: block !important; position: static; background: none; padding: 0; }
+    .report-page { box-shadow: none; border-radius: 0; }
+    .report-actions { display: none; }
+    body > *:not(.report-overlay) { display: none; }
+  }
+
   /* TOAST */
   .toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--text); color: var(--white); padding: 12px 24px; border-radius: 50px; font-size: 14px; font-family: 'Heebo', sans-serif; transition: transform 0.3s ease; z-index: 9999; }
   .toast.show { transform: translateX(-50%) translateY(0); }
@@ -303,8 +343,14 @@
       <div id="scoresBars"></div>
     </div>
     <div class="result-actions">
+      <button class="btn-report" onclick="openReport()">📄 הדוח האישי שלי</button>
       <button class="btn-share" onclick="copyLink()">📋 שתפו את השאלון</button>
       <button class="btn-restart" onclick="restartQuiz()">← התחילו מחדש</button>
+    </div>
+
+    <!-- REPORT OVERLAY -->
+    <div class="report-overlay" id="reportOverlay">
+      <div class="report-page" id="reportPage"></div>
     </div>
   </div>
 </div>
@@ -1793,6 +1839,101 @@ function exportHTML() {
 
   showToast('הקובץ יוצא ✓ שמרו אותו לשליחה ללקוחות');
 }
+
+// ── REPORT ───────────────────────────────────────────────────────────
+const STYLE_HEB = {
+  desert: 'מדברי / ים תיכוני',
+  rural:  'כפרי',
+  modern: 'מודרני',
+  scandi: 'סקנדינבי'
+};
+const STYLE_COLORS = {
+  desert: '#C8956C', rural: '#7A9E6B', modern: '#4A6FA5', scandi: '#9B8EA8'
+};
+const STYLE_LIGHT = {
+  desert: '#F5EDE4', rural: '#EEF5EA', modern: '#E8EFF8', scandi: '#F2EFF5'
+};
+const STYLE_EMOJI = {
+  desert: '🏺', rural: '🌿', modern: '◻️', scandi: '🌲'
+};
+
+function openReport() {
+  // Compute scores from answers
+  const scores = {desert:0, rural:0, modern:0, scandi:0};
+  Object.values(answers).forEach(s => { if (scores[s] !== undefined) scores[s]++; });
+  const total = Object.values(scores).reduce((a,b)=>a+b,0);
+  const winner = Object.entries(scores).sort((a,b)=>b[1]-a[1])[0][0];
+  const winnerPct = Math.round(scores[winner]/total*100);
+  const winnerColor = STYLE_COLORS[winner];
+
+  // Distribution bars
+  const barsHTML = Object.entries(scores)
+    .sort((a,b)=>b[1]-a[1])
+    .map(([sk,cnt]) => {
+      const pct = Math.round(cnt/total*100);
+      return `<div class="report-bar-row">
+        <div class="report-bar-label">${STYLE_EMOJI[sk]} ${STYLE_HEB[sk]}</div>
+        <div class="report-bar-track"><div class="report-bar-fill" style="width:${pct}%;background:${STYLE_COLORS[sk]}"></div></div>
+        <div class="report-bar-pct">${pct}%</div>
+      </div>`;
+    }).join('');
+
+  // Questions
+  const questionsHTML = QUESTIONS.map((q, i) => {
+    const chosen = answers[i] || '';
+    const col = STYLE_COLORS[chosen] || '#999';
+    const light = STYLE_LIGHT[chosen] || '#F5F5F5';
+    const imgUrl = q.options.find(o => o.style === chosen)?.img || '';
+    const imgEl = imgUrl
+      ? `<img class="report-q-img" src="${imgUrl}" onerror="this.style.display='none'">`
+      : `<div class="report-q-no-img">${STYLE_EMOJI[chosen]||''}</div>`;
+    return `<div class="report-q-row">
+      <div class="report-q-bar" style="background:${col}"></div>
+      ${imgEl}
+      <div class="report-q-content">
+        <div class="report-q-cat">${q.category}</div>
+        <div class="report-q-title">${q.title}</div>
+        <div class="report-q-chosen" style="color:${col};background:${light}">
+          ${STYLE_EMOJI[chosen]||''} ${STYLE_HEB[chosen]||chosen}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Lead name if available
+  const leadName = document.getElementById('leadName')?.value || '';
+  const nameText = leadName ? ` — ${leadName}` : '';
+
+  document.getElementById('reportPage').innerHTML = `
+    <div class="report-header">
+      <div class="report-badge">דוח אישי</div>
+      <h2>סגנון אדריכלי${nameText}</h2>
+      <p>על בסיס ${total} תשובות בשאלון</p>
+    </div>
+    <div class="report-winner" style="background:${winnerColor}">
+      <div class="report-winner-label">הסגנון המוביל שלך</div>
+      <div class="report-winner-name">${STYLE_EMOJI[winner]} ${STYLE_HEB[winner]}</div>
+      <div class="report-winner-pct">${winnerPct}% מהתשובות שלך</div>
+    </div>
+    <div class="report-bars">
+      <div class="report-section-title">התפלגות הסגנונות</div>
+      ${barsHTML}
+    </div>
+    <div class="report-section-title">הבחירות שלך — שאלה אחר שאלה</div>
+    <div class="report-questions">${questionsHTML}</div>
+    <div class="report-actions">
+      <button class="report-print" onclick="window.print()">🖨️ הדפסה / שמירה כ-PDF</button>
+      <button class="report-close" onclick="closeReport()">סגירה ×</button>
+    </div>`;
+
+  document.getElementById('reportOverlay').classList.add('open');
+  document.getElementById('reportOverlay').scrollTop = 0;
+}
+
+function closeReport() {
+  document.getElementById('reportOverlay').classList.remove('open');
+}
+
 </script>
 
 
