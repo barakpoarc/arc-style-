@@ -1,0 +1,1941 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>שאלון סגנון אדריכלי</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --desert: #C8956C; --desert-light: #F5EDE4;
+    --rural: #7A9E6B;  --rural-light: #EEF5EA;
+    --modern: #4A6FA5; --modern-light: #E8EFF8;
+    --scandi: #9B8EA8; --scandi-light: #F2EFF5;
+    --text: #1A1A1A; --text-muted: #6B6B6B;
+    --bg: #FAFAF8; --white: #FFFFFF; --border: #E5E0D8;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08); --radius: 16px;
+  }
+  body { font-family: 'Heebo', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; min-height: -webkit-fill-available; direction: rtl; -webkit-text-size-adjust: 100%; }
+
+  /* HEADER */
+  .header { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 2rem; position: -webkit-sticky; position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .logo { font-size: 18px; font-weight: 600; letter-spacing: -0.3px; }
+  .logo span { display: inline-block; width: 10px; height: 10px; background: var(--desert); border-radius: 50%; margin-left: 6px; margin-bottom: 1px; vertical-align: middle; }
+  .header-right { display: flex; align-items: center; gap: 14px; }
+  .progress-wrap { display: flex; align-items: center; gap: 12px; }
+  .progress-bar-bg { width: 160px; height: 4px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--desert), var(--modern)); border-radius: 4px; transition: width 0.5s ease; }
+  .progress-text { font-size: 13px; color: var(--text-muted); min-width: 60px; text-align: center; }
+
+  /* EDIT BUTTON IN HEADER */
+  .btn-edit-mode { background: #F0EDE8; border: none; color: var(--text-muted); padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; font-family: 'Heebo', sans-serif; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s; }
+  .btn-edit-mode:hover { background: #E5E0D8; color: var(--text); }
+  .pw-overlay { display: none; position: fixed; inset: 0; z-index: 900; background: rgba(0,0,0,0.45); align-items: center; justify-content: center; }
+  .pw-overlay.open { display: flex; }
+  .pw-box { background: var(--white); border-radius: 20px; padding: 36px 32px 28px; width: 340px; max-width: 90vw; text-align: center; box-shadow: 0 8px 40px rgba(0,0,0,0.18); }
+  .pw-icon { font-size: 32px; margin-bottom: 12px; }
+  .pw-box h3 { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
+  .pw-box p { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+  .pw-input { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-family: 'Heebo', sans-serif; font-size: 15px; text-align: center; letter-spacing: 3px; margin-bottom: 12px; outline: none; transition: border-color 0.2s; }
+  .pw-input:focus { border-color: #999; }
+  .pw-input.error { border-color: #CC4444; animation: shake 0.3s ease; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+  .pw-btn { width: 100%; background: var(--text); color: var(--white); border: none; padding: 13px; border-radius: 10px; font-size: 15px; font-weight: 500; font-family: 'Heebo', sans-serif; cursor: pointer; transition: all 0.2s; margin-bottom: 10px; }
+  .pw-btn:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+  .pw-cancel { background: none; border: none; color: var(--text-muted); font-size: 13px; font-family: 'Heebo', sans-serif; cursor: pointer; padding: 4px; }
+  .pw-cancel:hover { color: var(--text); }
+  .pw-error { font-size: 12px; color: #CC4444; min-height: 16px; margin-bottom: 8px; }
+  .btn-edit-mode.active { background: var(--text); color: var(--white); }
+
+  /* SCREENS */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* INTRO */
+  .intro { max-width: 680px; margin: 0 auto; padding: 80px 2rem 60px; text-align: center; }
+  .intro-badge { display: inline-block; background: var(--desert-light); color: #8B5E3C; font-size: 13px; font-weight: 500; padding: 6px 16px; border-radius: 20px; margin-bottom: 28px; }
+  .intro h1 { font-size: 42px; font-weight: 700; line-height: 1.2; margin-bottom: 16px; letter-spacing: -0.5px; }
+  .intro h1 em { font-style: normal; color: var(--desert); }
+  .intro p { font-size: 17px; color: var(--text-muted); line-height: 1.7; max-width: 480px; margin: 0 auto 40px; }
+  .start-btn { -webkit-tap-highlight-color: transparent; touch-action: manipulation; background: var(--text); color: var(--white); border: none; padding: 16px 48px; border-radius: 50px; font-size: 16px; font-weight: 500; font-family: 'Heebo', sans-serif; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+  .start-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+
+  /* LEAD CAPTURE SCREEN */
+  .lead-screen { max-width: 460px; margin: 0 auto; padding: 100px 2rem 60px; text-align: center; }
+  .lead-icon { font-size: 40px; margin-bottom: 16px; }
+  .lead-screen h2 { font-size: 28px; font-weight: 700; margin-bottom: 10px; }
+  .lead-screen > p { font-size: 15px; color: var(--text-muted); margin-bottom: 32px; }
+  .lead-form { text-align: right; margin-bottom: 28px; }
+  .lead-input { padding: 13px 14px; font-size: 15px; }
+  .lead-error { color: #CC4444; font-size: 13px; margin-top: 14px; min-height: 18px; }
+
+  /* QUESTION SCREEN */
+  .question-screen { max-width: 900px; margin: 0 auto; padding: 48px 2rem 80px; }
+  .q-category { font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 12px; }
+  .q-title { font-size: 28px; font-weight: 600; line-height: 1.35; margin-bottom: 40px; max-width: 600px; }
+  .options-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; margin-bottom: 48px; }
+  .option-card { -webkit-tap-highlight-color: transparent; touch-action: manipulation; background: var(--white); border: 2px solid var(--border); border-radius: var(--radius); overflow: hidden; cursor: pointer; transition: all 0.25s ease; position: relative; }
+  .option-card:hover { border-color: #BFBBBB; transform: translateY(-3px); box-shadow: var(--shadow); }
+  .option-card.selected { border-color: var(--text); box-shadow: 0 0 0 1px var(--text); }
+  .option-card.selected .check-icon { opacity: 1; transform: scale(1); }
+  .check-icon { position: absolute; top: 12px; left: 12px; width: 28px; height: 28px; background: var(--text); border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0; transform: scale(0.5); transition: all 0.2s ease; z-index: 2; }
+  .check-icon svg { width: 14px; height: 14px; stroke: white; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+  .style-swatch { width: 100%; height: 180px; display: flex; align-items: flex-end; justify-content: flex-start; padding: 14px; position: relative; overflow: hidden; }
+  .style-swatch::before { content: ''; position: absolute; inset: 0; }
+  .swatch-desert { background: linear-gradient(135deg, #D4A97A 0%, #C8956C 30%, #A0704A 60%, #8B5E3C 100%); }
+  .swatch-desert::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 60%; background: linear-gradient(to top, rgba(80,40,10,0.4), transparent); }
+  .swatch-rural { background: linear-gradient(135deg, #A8C890 0%, #7A9E6B 35%, #5A8050 65%, #3D6035 100%); }
+  .swatch-rural::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 60%; background: linear-gradient(to top, rgba(30,60,20,0.4), transparent); }
+  .swatch-modern { background: linear-gradient(135deg, #B8C8E0 0%, #7A96C0 35%, #4A6FA5 65%, #2A4F85 100%); }
+  .swatch-modern::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 60%; background: linear-gradient(to top, rgba(20,40,80,0.4), transparent); }
+  .swatch-scandi { background: linear-gradient(135deg, #EAE4F0 0%, #C8BDD8 35%, #9B8EA8 65%, #6B5E78 100%); }
+  .swatch-scandi::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 60%; background: linear-gradient(to top, rgba(50,35,65,0.4), transparent); }
+  .swatch-desert .pattern { position: absolute; inset: 0; opacity: 0.15; background-image: radial-gradient(circle at 20% 30%, #fff 1px, transparent 1px), radial-gradient(circle at 70% 70%, #fff 1px, transparent 1px); background-size: 40px 40px, 55px 55px; }
+  .swatch-rural .pattern { position: absolute; inset: 0; opacity: 0.12; background-image: repeating-linear-gradient(45deg, #fff 0, #fff 1px, transparent 0, transparent 50%); background-size: 12px 12px; }
+  .swatch-modern .pattern { position: absolute; inset: 0; opacity: 0.08; background-image: repeating-linear-gradient(0deg, #fff 0, #fff 1px, transparent 0, transparent 30px), repeating-linear-gradient(90deg, #fff 0, #fff 1px, transparent 0, transparent 30px); background-size: 30px 30px; }
+  .swatch-scandi .pattern { position: absolute; inset: 0; opacity: 0.10; background-image: radial-gradient(circle at 50% 50%, #fff 2px, transparent 2px); background-size: 24px 24px; }
+  .swatch-label { position: relative; z-index: 3; font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.9); }
+  .swatch-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -60%); font-size: 48px; z-index: 2; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3)); }
+  /* Custom image on swatch */
+  .swatch-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
+  .option-body { padding: 16px 18px 18px; }
+  .option-name { font-size: 15px; font-weight: 600; margin-bottom: 5px; }
+  .option-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+  .option-card[data-style="desert"].selected { border-color: var(--desert); box-shadow: 0 0 0 1px var(--desert); }
+  .option-card[data-style="rural"].selected   { border-color: var(--rural);  box-shadow: 0 0 0 1px var(--rural);  }
+  .option-card[data-style="modern"].selected  { border-color: var(--modern); box-shadow: 0 0 0 1px var(--modern); }
+  .option-card[data-style="scandi"].selected  { border-color: var(--scandi); box-shadow: 0 0 0 1px var(--scandi); }
+  .option-card[data-style="desert"].selected .check-icon { background: var(--desert); }
+  .option-card[data-style="rural"].selected   .check-icon { background: var(--rural);  }
+  .option-card[data-style="modern"].selected  .check-icon { background: var(--modern); }
+  .option-card[data-style="scandi"].selected  .check-icon { background: var(--scandi); }
+
+  /* NAV */
+  .nav-buttons { display: flex; justify-content: space-between; align-items: center; }
+  .btn-back { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 12px 28px; border-radius: 50px; font-size: 14px; font-weight: 500; font-family: 'Heebo', sans-serif; cursor: pointer; transition: all 0.2s; }
+  .btn-back:hover { border-color: #999; color: var(--text); }
+  .btn-next { background: var(--text); color: var(--white); border: none; padding: 14px 36px; border-radius: 50px; font-size: 15px; font-weight: 500; font-family: 'Heebo', sans-serif; cursor: pointer; transition: all 0.2s; opacity: 0.35; pointer-events: none; }
+  .btn-next.enabled { opacity: 1; pointer-events: all; }
+  .btn-next.enabled:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,0.18); }
+
+  /* RESULTS */
+  .results-screen { max-width: 820px; margin: 0 auto; padding: 60px 2rem 80px; }
+  .results-header { text-align: center; margin-bottom: 56px; }
+  .results-header h2 { font-size: 36px; font-weight: 700; margin-bottom: 12px; }
+  .results-header p { font-size: 16px; color: var(--text-muted); }
+  .result-main { background: var(--white); border: 1px solid var(--border); border-radius: 24px; overflow: hidden; margin-bottom: 24px; }
+  .result-banner { height: 200px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+  .result-banner-text { position: relative; z-index: 2; text-align: center; color: white; }
+  .result-banner-text .big-emoji { font-size: 56px; display: block; margin-bottom: 8px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3)); }
+  .result-banner-text h3 { font-size: 26px; font-weight: 700; text-shadow: 0 1px 6px rgba(0,0,0,0.4); }
+  .result-body { padding: 32px 36px; }
+  .result-subtitle { font-size: 13px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+  .result-desc { font-size: 16px; line-height: 1.75; color: var(--text); margin-bottom: 28px; }
+  .result-traits { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+  .trait-tag { padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500; }
+  .result-palette { display: flex; gap: 10px; align-items: center; }
+  .result-palette-label { font-size: 13px; color: var(--text-muted); margin-left: 4px; }
+  .palette-dot { width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.1); }
+  .scores-section { margin-bottom: 36px; }
+  .scores-title { font-size: 16px; font-weight: 600; margin-bottom: 20px; }
+  .score-row { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+  .score-name { font-size: 14px; font-weight: 500; width: 130px; flex-shrink: 0; }
+  .score-bar-bg { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .score-bar-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+  .score-pct { font-size: 13px; color: var(--text-muted); width: 36px; text-align: left; }
+  .result-actions { display: flex; gap: 12px; justify-content: center; margin-top: 40px; }
+  .btn-share { background: var(--text); color: var(--white); border: none; padding: 14px 32px; border-radius: 50px; font-size: 15px; font-weight: 500; font-family: 'Heebo', sans-serif; cursor: pointer; transition: all 0.2s; }
+  .btn-share:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,0.18); }
+  .btn-restart { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 14px 32px; border-radius: 50px; font-size: 15px; font-weight: 500; font-family: 'Heebo', sans-serif; cursor: pointer; transition: all 0.2s; }
+  .btn-restart:hover { border-color: #999; color: var(--text); }
+
+  /* REPORT */
+  .btn-report { background: linear-gradient(135deg, #C8956C, #9B8EA8); color: white; border: none; padding: 14px 32px; border-radius: 50px; font-size: 15px; font-weight: 500; font-family: 'Heebo', sans-serif; cursor: pointer; transition: all 0.2s; }
+  .btn-report:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
+  .report-overlay { display: none; position: fixed; inset: 0; z-index: 800; background: rgba(0,0,0,0.6); overflow-y: auto; padding: 20px; }
+  .report-overlay.open { display: block; }
+  .report-page { max-width: 760px; margin: 0 auto; background: white; border-radius: 20px; overflow: hidden; padding: 36px 32px; }
+  .report-header { text-align: center; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid #E5E0D8; }
+  .report-badge { display: inline-block; background: #F5F3F0; color: #6B6B6B; font-size: 12px; padding: 4px 14px; border-radius: 20px; margin-bottom: 10px; }
+  .report-header h2 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+  .report-header p { font-size: 13px; color: #6B6B6B; }
+  .report-winner { border-radius: 14px; padding: 24px; text-align: center; margin-bottom: 24px; color: white; }
+  .report-winner-label { font-size: 12px; opacity: 0.85; margin-bottom: 4px; }
+  .report-winner-name { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  .report-winner-pct { font-size: 14px; opacity: 0.9; }
+  .report-section-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+  .report-bars { margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid #E5E0D8; }
+  .report-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .report-bar-label { font-size: 12px; font-weight: 500; width: 150px; flex-shrink: 0; text-align: right; }
+  .report-bar-track { flex: 1; height: 8px; background: #F0EDE8; border-radius: 4px; overflow: hidden; }
+  .report-bar-fill { height: 100%; border-radius: 4px; }
+  .report-bar-pct { font-size: 12px; color: #6B6B6B; width: 32px; }
+  .report-questions { display: flex; flex-direction: column; gap: 10px; }
+  .report-q-row { display: flex; align-items: stretch; border: 1px solid #E5E0D8; border-radius: 10px; overflow: hidden; }
+  .report-q-bar { width: 4px; flex-shrink: 0; }
+  .report-q-img { width: 110px; flex-shrink: 0; object-fit: cover; display: block; }
+  .report-q-no-img { width: 110px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+  .report-q-content { flex: 1; padding: 10px 12px; }
+  .report-q-cat { font-size: 10px; color: #999; margin-bottom: 2px; }
+  .report-q-title { font-size: 12px; font-weight: 500; margin-bottom: 6px; line-height: 1.4; }
+  .report-q-chosen { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+  .report-actions { display: flex; gap: 10px; justify-content: center; margin-top: 24px; padding-top: 20px; border-top: 1px solid #E5E0D8; }
+  .report-close { background: none; border: 1px solid #E5E0D8; color: #6B6B6B; padding: 10px 24px; border-radius: 50px; font-size: 14px; font-family: 'Heebo', sans-serif; cursor: pointer; }
+  .report-print { background: #1A1A1A; color: white; border: none; padding: 10px 24px; border-radius: 50px; font-size: 14px; font-family: 'Heebo', sans-serif; cursor: pointer; }
+  @media print {
+    .report-overlay { display: block !important; position: static; background: none; padding: 0; }
+    .report-page { box-shadow: none; border-radius: 0; }
+    .report-actions { display: none; }
+    body > *:not(.report-overlay) { display: none; }
+  }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--text); color: var(--white); padding: 12px 24px; border-radius: 50px; font-size: 14px; font-family: 'Heebo', sans-serif; transition: transform 0.3s ease; z-index: 9999; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ═══════════════ EDITOR ═══════════════ */
+  .editor-overlay { display: none; position: fixed; inset: 0; z-index: 500; background: rgba(0,0,0,0.5); }
+  .editor-overlay.open { display: flex; }
+  .editor-panel { background: var(--white); width: 520px; max-width: 95vw; height: 100vh; overflow-y: auto; box-shadow: -4px 0 32px rgba(0,0,0,0.15); display: flex; flex-direction: column; margin-right: auto; }
+  .editor-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; position: -webkit-sticky; position: sticky; top: 0; background: var(--white); z-index: 2; }
+  .editor-title { font-size: 17px; font-weight: 600; }
+  .editor-close { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--text-muted); line-height: 1; padding: 4px; }
+  .editor-close:hover { color: var(--text); }
+  .editor-body { padding: 24px; flex: 1; }
+  .editor-tabs { display: flex; gap: 4px; margin-bottom: 24px; background: #F5F3F0; border-radius: 10px; padding: 4px; }
+  .editor-tab { flex: 1; padding: 8px; border: none; background: none; font-family: 'Heebo', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; border-radius: 8px; color: var(--text-muted); transition: all 0.2s; }
+  .editor-tab.active { background: var(--white); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+  .editor-section { display: none; }
+  .editor-section.active { display: block; }
+
+  /* General tab */
+  .field-group { margin-bottom: 20px; }
+  .field-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 6px; display: block; }
+  .field-input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: 'Heebo', sans-serif; font-size: 14px; color: var(--text); background: var(--white); transition: border-color 0.2s; }
+  .field-input:focus { outline: none; border-color: #999; }
+  textarea.field-input { resize: vertical; min-height: 70px; }
+
+  /* Questions tab */
+  .q-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+  .q-list-item { padding: 12px 14px; background: #F8F7F5; border: 1px solid var(--border); border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 10px; transition: all 0.15s; }
+  .q-list-item:hover { background: #F0EDE8; }
+  .q-list-item.active { background: #EAE4F0; border-color: var(--scandi); }
+  .q-list-num { font-size: 12px; font-weight: 700; color: var(--text-muted); width: 22px; flex-shrink: 0; }
+  .q-list-text { font-size: 13px; font-weight: 500; flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .q-edit-panel { background: #F8F7F5; border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 20px; }
+  .q-edit-panel h4 { font-size: 14px; font-weight: 600; margin-bottom: 14px; }
+  .options-edit-grid { display: flex; flex-direction: column; gap: 14px; margin-top: 14px; }
+  .opt-edit-row { background: var(--white); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .opt-edit-header { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-bottom: 1px solid var(--border); background: #FAFAF8; }
+  .opt-style-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .opt-style-label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+  .opt-edit-body { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+  .opt-edit-body .field-input { font-size: 13px; padding: 8px 10px; }
+
+  /* Image upload row */
+  .img-upload-row { display: flex; align-items: center; gap: 10px; }
+  .img-preview { width: 52px; height: 40px; border-radius: 6px; object-fit: cover; border: 1px solid var(--border); background: #F0EDE8; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; overflow: hidden; }
+  .img-preview img { width: 100%; height: 100%; object-fit: cover; }
+  .btn-upload { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 6px 12px; border-radius: 6px; font-size: 12px; font-family: 'Heebo', sans-serif; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+  .btn-upload:hover { border-color: #999; color: var(--text); }
+  .btn-remove-img { background: none; border: none; color: #CC4444; font-size: 12px; font-family: 'Heebo', sans-serif; cursor: pointer; padding: 0; }
+  .file-input-hidden { display: none; }
+
+  /* Save button */
+  .editor-footer { padding: 16px 24px; border-top: 1px solid var(--border); position: sticky; bottom: 0; background: var(--white); }
+  .btn-save { width: 100%; background: var(--text); color: var(--white); border: none; padding: 13px; border-radius: 10px; font-size: 15px; font-weight: 500; font-family: 'Heebo', sans-serif; cursor: pointer; transition: all 0.2s; }
+  .btn-save:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+  .btn-export { width: 100%; background: var(--white); color: var(--text); border: 1px solid var(--border); padding: 13px; border-radius: 10px; font-size: 15px; font-weight: 500; font-family: 'Heebo', sans-serif; cursor: pointer; transition: all 0.2s; margin-top: 10px; }
+  .btn-export:hover { border-color: #999; background: #F8F7F5; }
+  .export-hint { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-top: 10px; text-align: center; }
+
+  @media (max-width: 600px) {
+    .options-grid { grid-template-columns: 1fr; }
+    .intro h1 { font-size: 30px; }
+    .progress-bar-bg { width: 100px; }
+    .result-body { padding: 24px 20px; }
+    .result-actions { flex-direction: column; }
+    .editor-panel { width: 100vw; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="logo"><span></span>סגנון אדריכלי</div>
+  <div class="header-right">
+    <button class="btn-edit-mode" id="btnOpenEditor" onclick="openEditor()">✏️ עריכה</button>
+    <div class="progress-wrap">
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill" style="width: 0%;"></div></div>
+      <div class="progress-text" id="progressText"></div>
+    </div>
+  </div>
+</header>
+
+<!-- INTRO SCREEN -->
+<div class="screen active" id="screen-intro">
+  <div class="intro">
+    <div class="intro-badge" id="edit-badge">שאלון עיצוב אדריכלי · 20 שאלות</div>
+    <h1>מה <em>הסגנון שלך</em><br>בבית?</h1>
+    <p id="edit-intro-desc">ענו על 20 שאלות קצרות וקלות, על פי האינטואיציה שלכם — ובסוף נגלה לכם איזה סגנון אדריכלי הכי מתאים לכם.</p>
+    <button class="start-btn" onclick="startQuiz()" id="edit-start-btn" style="margin-top: 8px">התחילו את השאלון ←</button>
+  </div>
+</div>
+
+<!-- QUESTION SCREEN -->
+<div class="screen" id="screen-question">
+  <div class="question-screen">
+    <div class="q-category" id="qCategory">הרגשה</div>
+    <h2 class="q-title" id="qTitle">בסוף יום ארוך, איך אתם רוצים שביתכם יגרום לכם להרגיש?</h2>
+    <div class="options-grid" id="optionsGrid"></div>
+    <div class="nav-buttons">
+      <button class="btn-back" onclick="prevQuestion()" style="visibility: visible;">← חזרה</button>
+      <button class="btn-next" id="btnNext" onclick="nextQuestion()">לתוצאות ←</button>
+    </div>
+  </div>
+</div>
+
+<!-- LEAD CAPTURE SCREEN -->
+<div class="screen" id="screen-lead">
+  <div class="lead-screen">
+    <div class="lead-icon">✨</div>
+    <h2>התוצאות שלכם מוכנות!</h2>
+    <p>השאירו פרטים כדי לקבל את הסגנון האדריכלי המתאים לכם</p>
+    <div class="lead-form">
+      <div class="field-group">
+        <label class="field-label">שם מלא</label>
+        <input class="field-input lead-input" id="leadName" type="text" placeholder="השם שלך">
+      </div>
+      <div class="field-group">
+        <label class="field-label">טלפון או אימייל</label>
+        <input class="field-input lead-input" id="leadContact" type="text" placeholder="050-0000000 או your@email.com">
+      </div>
+    </div>
+    <button class="start-btn" onclick="submitLead()" id="btnSubmitLead">לתוצאות שלי ←</button>
+    <p class="lead-error" id="leadError"></p>
+  </div>
+</div>
+
+<!-- RESULTS SCREEN -->
+<div class="screen" id="screen-results">
+  <div class="results-screen">
+    <div class="results-header">
+      <h2 id="resultTitle"></h2>
+      <p id="resultSubtitle"></p>
+    </div>
+    <div class="result-main">
+      <div class="result-banner" id="resultBanner">
+        <div class="result-banner-text">
+          <span class="big-emoji" id="resultEmoji"></span>
+          <h3 id="resultStyleName"></h3>
+        </div>
+      </div>
+      <div class="result-body">
+        <div class="result-subtitle">הסגנון שלכם</div>
+        <p class="result-desc" id="resultDesc"></p>
+        <div class="result-traits" id="resultTraits"></div>
+        <div class="result-palette" id="resultPalette"></div>
+      </div>
+    </div>
+    <div class="scores-section">
+      <div class="scores-title">התפלגות הסגנונות שלכם</div>
+      <div id="scoresBars"></div>
+    </div>
+    <div class="result-actions">
+      <button class="btn-report" onclick="openReport()">📄 הדוח האישי שלי</button>
+      <button class="btn-share" onclick="copyLink()">📋 שתפו את השאלון</button>
+      <button class="btn-restart" onclick="restartQuiz()">← התחילו מחדש</button>
+    </div>
+
+    <!-- REPORT OVERLAY -->
+    <div class="report-overlay" id="reportOverlay">
+      <div class="report-page" id="reportPage"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PASSWORD MODAL -->
+<div class="pw-overlay" id="pwOverlay">
+  <div class="pw-box">
+    <div class="pw-icon">🔒</div>
+    <h3>כניסה לעריכה</h3>
+    <p>הזינו סיסמה כדי לערוך את השאלון</p>
+    <input class="pw-input" id="pwInput" type="password" placeholder="••••••" maxlength="20" onkeydown="if(event.key==='Enter')checkPassword()">
+    <div class="pw-error" id="pwError"></div>
+    <button class="pw-btn" onclick="checkPassword()">כניסה</button>
+    <button class="pw-cancel" onclick="closePwModal()">ביטול</button>
+  </div>
+</div>
+
+<!-- EDITOR OVERLAY -->
+<div class="editor-overlay" id="editorOverlay" onclick="closeEditorOnBg(event)">
+  <div class="editor-panel" id="editorPanel">
+    <div class="editor-header">
+      <div class="editor-title">✏️ עריכת השאלון</div>
+      <button class="editor-close" onclick="closeEditor()">×</button>
+    </div>
+    <div class="editor-body">
+      <!-- TABS -->
+      <div class="editor-tabs">
+        <button class="editor-tab" onclick="switchTab('general',this)">כללי</button>
+        <button class="editor-tab active" onclick="switchTab('questions',this)">שאלות ותמונות</button>
+      </div>
+
+      <!-- GENERAL TAB -->
+      <div class="editor-section" id="tab-general">
+        <div class="field-group">
+          <label class="field-label">שם השאלון (badge)</label>
+          <input class="field-input" id="fe-badge" type="text" placeholder="שאלון עיצוב אדריכלי · 20 שאלות">
+        </div>
+        <div class="field-group">
+          <label class="field-label">תיאור מבוא</label>
+          <textarea class="field-input" id="fe-intro-desc" rows="3"></textarea>
+        </div>
+        <div class="field-group">
+          <label class="field-label">טקסט כפתור התחלה</label>
+          <input class="field-input" id="fe-start-btn" type="text">
+        </div>
+        <hr style="border:none;border-top:1px solid var(--border);margin:24px 0">
+        <div style="font-size:13px;font-weight:600;margin-bottom:16px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.8px">תיאורי תוצאות</div>
+        <div id="style-results-fields">
+      <div style="margin-bottom:20px;padding:14px;background:#F8F7F5;border-radius:10px;border-right:3px solid #C8956C">
+        <div style="font-size:13px;font-weight:600;margin-bottom:10px">🏺 מדברי / ים תיכוני</div>
+        <label class="field-label">תיאור תוצאה</label>
+        <textarea class="field-input" id="fe-style-desc-desert" rows="3">הבית שלכם ידבר בשפה של אדמה, אבן וחמסה. חומרים טבעיים כמו טרה קוטה, כורכר וסיד, קשתות מוארכות, ורכיבי ים תיכוני עשירים יחד עם גוונים חמים של חול, שזוף ואוקר — אלה הם הרכיבים שיהפכו את ביתכם למקלט נשמה מרשים.</textarea>
+      </div>
+      <div style="margin-bottom:20px;padding:14px;background:#F8F7F5;border-radius:10px;border-right:3px solid #7A9E6B">
+        <div style="font-size:13px;font-weight:600;margin-bottom:10px">🌿 כפרי</div>
+        <label class="field-label">תיאור תוצאה</label>
+        <textarea class="field-input" id="fe-style-desc-rural" rows="3">ביתכם ינשום אוויר צח של טבע ופשטות. עץ ישן מחוספס, אבן שדה, וחיים בחיבור עמוק עם הסביבה. חומרים אותנטיים, צבעים מהטבע, וקסם כפרי שמייצר תחושת חמימות ובית אמיתי.</textarea>
+      </div>
+      <div style="margin-bottom:20px;padding:14px;background:#F8F7F5;border-radius:10px;border-right:3px solid #4A6FA5">
+        <div style="font-size:13px;font-weight:600;margin-bottom:10px">◻️ מודרני</div>
+        <label class="field-label">תיאור תוצאה</label>
+        <textarea class="field-input" id="fe-style-desc-modern" rows="3">קווים נקיים, פתיחות, ותפקודיות מקסימלית — זה הבית שלכם. בטון, זכוכית ומתכת בהרמוניה מושלמת. חללים גדולים עם אור טבעי שוטף, ריהוט עם חתימה עיצובית, ופלטה שקטה שמאפשרת לכל פרט לדבר בעצמו.</textarea>
+      </div>
+      <div style="margin-bottom:20px;padding:14px;background:#F8F7F5;border-radius:10px;border-right:3px solid #9B8EA8">
+        <div style="font-size:13px;font-weight:600;margin-bottom:10px">🌲 סקנדינבי</div>
+        <label class="field-label">תיאור תוצאה</label>
+        <textarea class="field-input" id="fe-style-desc-scandi" rows="3">Hygge — תחושת החמימות הסקנדינבית — תשרה בכל פינה. עץ בהיר, טקסטיל רך ואור נרות. פשטות שמכילה יופי עדין ותפקוד מדויק. כל פריט נבחר בקפידה לטובת הרווחה הנפשית של הדיירים.</textarea>
+      </div></div>
+      </div>
+
+      <!-- QUESTIONS TAB -->
+      <div class="editor-section active" id="tab-questions">
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">לחצו על שאלה לעריכה</p>
+        <div class="q-list" id="editorQList"><div class="q-list-item"><span class="q-list-num">1</span><span class="q-list-text">איזה מראה חיצוני של בית הכי מושך אתכם?</span></div><div class="q-list-item"><span class="q-list-num">2</span><span class="q-list-text">איזה ריצוף הייתם בוחרים לסלון?</span></div><div class="q-list-item"><span class="q-list-num">3</span><span class="q-list-text">איזה שילוב צבעים הכי מדבר אליכם?</span></div><div class="q-list-item"><span class="q-list-num">4</span><span class="q-list-text">דמיינו את מטבח החלומות שלכם — למה הוא הכי דומה?</span></div><div class="q-list-item"><span class="q-list-num">5</span><span class="q-list-text">בחדר שינה — מה הכי מרגיע?</span></div><div class="q-list-item"><span class="q-list-num">6</span><span class="q-list-text">איזה יחס לאור ולחלונות מתאים לכם?</span></div><div class="q-list-item"><span class="q-list-num">7</span><span class="q-list-text">איזה חומר הכי מדבר אליכם?</span></div><div class="q-list-item"><span class="q-list-num">8</span><span class="q-list-text">מה תרצו לראות כשתפתחו דלת לחוץ?</span></div><div class="q-list-item"><span class="q-list-num">9</span><span class="q-list-text">מה היא חופשת החלומות שלכם?</span></div><div class="q-list-item"><span class="q-list-num">10</span><span class="q-list-text">חדר האמבטיה האידיאלי שלכם נראה כך:</span></div><div class="q-list-item"><span class="q-list-num">11</span><span class="q-list-text">לאיזו עונה אתם מחכים כל השנה?</span></div><div class="q-list-item"><span class="q-list-num">12</span><span class="q-list-text">איזה פריט אמנות הייתם שמחים לראות בביתכם?</span></div><div class="q-list-item"><span class="q-list-num">13</span><span class="q-list-text">בשבת בבוקר — היכן אתם רוצים לשתות קפה?</span></div><div class="q-list-item"><span class="q-list-num">14</span><span class="q-list-text">איך אתם מעדיפים לארגן את החפצים בבית?</span></div><div class="q-list-item"><span class="q-list-num">15</span><span class="q-list-text">אפשר לבחור רק אחד:</span></div><div class="q-list-item"><span class="q-list-num">16</span><span class="q-list-text">איך אתם מדמיינים את הזרימה בבית המושלם?</span></div><div class="q-list-item"><span class="q-list-num">17</span><span class="q-list-text">מה הוא סגנון הגג האידאלי?</span></div><div class="q-list-item"><span class="q-list-num">18</span><span class="q-list-text">ואיך נראית התקרה מבפנים</span></div><div class="q-list-item active"><span class="q-list-num">19</span><span class="q-list-text">רוצים צמחים צמחים בבית?</span></div><div class="q-list-item"><span class="q-list-num">20</span><span class="q-list-text">בסוף יום ארוך, איך אתם רוצים שביתכם יגרום לכם להרגיש?</span></div></div>
+        <div id="editorQPanel" style="display: block;">
+    <div class="q-edit-panel">
+      <h4>שאלה 19</h4>
+      <div class="field-group">
+        <label class="field-label">קטגוריה</label>
+        <input class="field-input" id="qe-cat" value="צמחי בית">
+      </div>
+      <div class="field-group">
+        <label class="field-label">טקסט השאלה</label>
+        <textarea class="field-input" id="qe-title" rows="2">רוצים צמחים צמחים בבית?</textarea>
+      </div>
+      <div class="options-edit-grid" id="qe-options">
+        
+          <div class="opt-edit-row">
+            <div class="opt-edit-header">
+              <div class="opt-style-dot" style="background:#C8956C"></div>
+              <span class="opt-style-label">מדברי/ים תיכוני</span>
+            </div>
+            <div class="opt-edit-body">
+              <input class="field-input" id="qe-opt-name-0" placeholder="שם האפשרות" value="סקולנטים של בית">
+              <textarea class="field-input" id="qe-opt-desc-0" rows="2" placeholder="תיאור">צמחי אוויר על ענפים טבעיים או טרריום</textarea>
+              <div class="img-upload-row">
+                <div class="img-preview" id="qe-img-preview-0">
+                  
+                </div>
+                <button class="btn-upload" onclick="triggerImgUpload(18,0)">📷 העלאת תמונה</button>
+                <input type="file" accept="image/*" class="file-input-hidden" id="qe-file-0" onchange="handleImgUpload(event,18,0)">
+                <button class="btn-remove-img" onclick="removeImg(18,0)">✕ הסר</button>
+              </div>
+            </div>
+          </div>
+          <div class="opt-edit-row">
+            <div class="opt-edit-header">
+              <div class="opt-style-dot" style="background:#7A9E6B"></div>
+              <span class="opt-style-label">כפרי</span>
+            </div>
+            <div class="opt-edit-body">
+              <input class="field-input" id="qe-opt-name-1" placeholder="שם האפשרות" value="שלל עציצים">
+              <textarea class="field-input" id="qe-opt-desc-1" rows="2" placeholder="תיאור">עציצים וייחורים בבית ובמרפסת איפה שרק אפשר</textarea>
+              <div class="img-upload-row">
+                <div class="img-preview" id="qe-img-preview-1">
+                  
+                </div>
+                <button class="btn-upload" onclick="triggerImgUpload(18,1)">📷 העלאת תמונה</button>
+                <input type="file" accept="image/*" class="file-input-hidden" id="qe-file-1" onchange="handleImgUpload(event,18,1)">
+                <button class="btn-remove-img" onclick="removeImg(18,1)">✕ הסר</button>
+              </div>
+            </div>
+          </div>
+          <div class="opt-edit-row">
+            <div class="opt-edit-header">
+              <div class="opt-style-dot" style="background:#4A6FA5"></div>
+              <span class="opt-style-label">מודרני</span>
+            </div>
+            <div class="opt-edit-body">
+              <input class="field-input" id="qe-opt-name-2" placeholder="שם האפשרות" value="פרחים מינימליסטיים">
+              <textarea class="field-input" id="qe-opt-desc-2" rows="2" placeholder="תיאור">סחלבים, או משהו באסטתיקה יפנית - נקי אך מיוחד</textarea>
+              <div class="img-upload-row">
+                <div class="img-preview" id="qe-img-preview-2">
+                  
+                </div>
+                <button class="btn-upload" onclick="triggerImgUpload(18,2)">📷 העלאת תמונה</button>
+                <input type="file" accept="image/*" class="file-input-hidden" id="qe-file-2" onchange="handleImgUpload(event,18,2)">
+                <button class="btn-remove-img" onclick="removeImg(18,2)">✕ הסר</button>
+              </div>
+            </div>
+          </div>
+          <div class="opt-edit-row">
+            <div class="opt-edit-header">
+              <div class="opt-style-dot" style="background:#9B8EA8"></div>
+              <span class="opt-style-label">סקנדינבי</span>
+            </div>
+            <div class="opt-edit-body">
+              <input class="field-input" id="qe-opt-name-3" placeholder="שם האפשרות" value="סידורים מיובשים">
+              <textarea class="field-input" id="qe-opt-desc-3" rows="2" placeholder="תיאור">פרחים וענפים מיובשים בכלים תואמים</textarea>
+              <div class="img-upload-row">
+                <div class="img-preview" id="qe-img-preview-3">
+                  
+                </div>
+                <button class="btn-upload" onclick="triggerImgUpload(18,3)">📷 העלאת תמונה</button>
+                <input type="file" accept="image/*" class="file-input-hidden" id="qe-file-3" onchange="handleImgUpload(event,18,3)">
+                <button class="btn-remove-img" onclick="removeImg(18,3)">✕ הסר</button>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div></div>
+      </div>
+    </div>
+    <div class="editor-footer">
+      <button class="btn-save" onclick="saveEdits()">💾 שמירה והחלה</button>
+      <button class="btn-export" onclick="exportHTML()">⬇️ ייצוא קובץ מעודכן</button>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────
+const STYLES = {
+  "desert": {
+    "name": "מדברי / ים תיכוני",
+    "emoji": "🏺",
+    "color": "#C8956C",
+    "gradients": "linear-gradient(135deg,#D4A97A,#A0704A,#6B3A1F)",
+    "desc": "הבית שלכם ידבר בשפה של אדמה, אבן וחמסה. חומרים טבעיים כמו טרה קוטה, כורכר וסיד, קשתות מוארכות, ורכיבי ים תיכוני עשירים יחד עם גוונים חמים של חול, שזוף ואוקר — אלה הם הרכיבים שיהפכו את ביתכם למקלט נשמה מרשים.",
+    "traits": [
+      "טרה קוטה",
+      "קשתות אבן",
+      "גוונים חמים",
+      "חומרים טבעיים",
+      "פטיו מוצל",
+      "עציצי חרס"
+    ],
+    "palette": [
+      "#D4A97A",
+      "#C8956C",
+      "#A0704A",
+      "#8B5E3C",
+      "#6B3A1F"
+    ],
+    "tagBg": "#F5EDE4",
+    "tagColor": "#8B5E3C"
+  },
+  "rural": {
+    "name": "כפרי",
+    "emoji": "🌿",
+    "color": "#7A9E6B",
+    "gradients": "linear-gradient(135deg,#A8C890,#5A8050,#3D6035)",
+    "desc": "ביתכם ינשום אוויר צח של טבע ופשטות. עץ ישן מחוספס, אבן שדה, וחיים בחיבור עמוק עם הסביבה. חומרים אותנטיים, צבעים מהטבע, וקסם כפרי שמייצר תחושת חמימות ובית אמיתי.",
+    "traits": [
+      "עץ מחוספס",
+      "אבן שדה",
+      "גגות רעפים",
+      "ירוק וחרדל",
+      "תנור עצים",
+      "גינה עשבונית"
+    ],
+    "palette": [
+      "#A8C890",
+      "#7A9E6B",
+      "#5A8050",
+      "#3D6035",
+      "#2A4020"
+    ],
+    "tagBg": "#EEF5EA",
+    "tagColor": "#3D6035"
+  },
+  "modern": {
+    "name": "מודרני",
+    "emoji": "◻️",
+    "color": "#4A6FA5",
+    "gradients": "linear-gradient(135deg,#B8C8E0,#4A6FA5,#2A4F85)",
+    "desc": "קווים נקיים, פתיחות, ותפקודיות מקסימלית — זה הבית שלכם. בטון, זכוכית ומתכת בהרמוניה מושלמת. חללים גדולים עם אור טבעי שוטף, ריהוט עם חתימה עיצובית, ופלטה שקטה שמאפשרת לכל פרט לדבר בעצמו.",
+    "traits": [
+      "קווים נקיים",
+      "בטון חשוף",
+      "חלונות ענק",
+      "ריהוט מינימל",
+      "חומרים תעשייתיים",
+      "פלטה נייטרל"
+    ],
+    "palette": [
+      "#B8C8E0",
+      "#7A96C0",
+      "#4A6FA5",
+      "#2A4F85",
+      "#0A2F65"
+    ],
+    "tagBg": "#E8EFF8",
+    "tagColor": "#2A4F85"
+  },
+  "scandi": {
+    "name": "סקנדינבי",
+    "emoji": "🌲",
+    "color": "#9B8EA8",
+    "gradients": "linear-gradient(135deg,#EAE4F0,#9B8EA8,#6B5E78)",
+    "desc": "Hygge — תחושת החמימות הסקנדינבית — תשרה בכל פינה. עץ בהיר, טקסטיל רך ואור נרות. פשטות שמכילה יופי עדין ותפקוד מדויק. כל פריט נבחר בקפידה לטובת הרווחה הנפשית של הדיירים.",
+    "traits": [
+      "עץ בהיר",
+      "טקסטיל רך",
+      "לבן ואפור",
+      "תאורת נרות",
+      "פונקציונלי",
+      "מינימל חם"
+    ],
+    "palette": [
+      "#EAE4F0",
+      "#C8BDD8",
+      "#9B8EA8",
+      "#6B5E78",
+      "#3B2E48"
+    ],
+    "tagBg": "#F2EFF5",
+    "tagColor": "#6B5E78"
+  }
+};
+
+const QUESTIONS = [
+  {
+    "category": "חזות חיצונית",
+    "title": "איזה מראה חיצוני של בית הכי מושך אתכם?",
+    "options": [
+      {
+        "style": "desert",
+        "name": "טבעי ומשתלב בסביבה",
+        "desc": "פינות מעוגלות, קשתות, טיח טבעי",
+        "swatch": "swatch-desert",
+        "icon": "🏺",
+        "img": "https://lh3.googleusercontent.com/d/1a1oHqsOIA5xfCM2H28uNFw30gy0to1jb"
+      },
+      {
+        "style": "rural",
+        "name": "בית אבן עם אופי",
+        "desc": "אבן שדה, גג רעפים, דלתות עץ ",
+        "swatch": "swatch-rural",
+        "icon": "🌿",
+        "img": "https://lh3.googleusercontent.com/d/1H7-nsrFNgYm7TS6HNI7vcpmeVr0uBLAe"
+      },
+      {
+        "style": "modern",
+        "name": "קוביית בטון",
+        "desc": "קווים ישרים מוחלטים, בטון וזכוכית, גג שטוח ",
+        "swatch": "swatch-modern",
+        "icon": "◻️",
+        "img": "https://lh3.googleusercontent.com/d/1bN_TVRMowyD-GRJMVWjWV45LeX1y2lwP"
+      },
+      {
+        "style": "scandi",
+        "name": "עץ ולבן",
+        "desc": "חיפוי עץ בהיר, חלונות גדולים, גג משופע ",
+        "swatch": "swatch-scandi",
+        "icon": "🌲",
+        "img": "https://lh3.googleusercontent.com/d/1rrMpWIFAKHR-tRHYGAmkdEwzx5j-eAxf"
+      }
+    ]
+  },
+  {
+    "category": "ריצוף וחיפויים",
+    "title": "איזה ריצוף הייתם בוחרים לסלון?",
+    "options": [
+      {
+        "style": "desert",
+        "name": "אבן טבעית ",
+        "desc": "אריחי אבן טבעית או טרה קוטה, לא אחידים, בגוני חמרה ושמנת",
+        "swatch": "swatch-desert",
+        "icon": "🟫",
+        "img": "https://lh3.googleusercontent.com/d/1jYPHpR0OFH4Ho7ZodF6tVA3XShcyJshL"
+      },
+      {
+        "style": "rural",
+        "name": "פרקט עץ מלא",
+        "desc": "קרשי עץ רחבים עם מראה מחוספס, בגוון דבש כהה",
+        "swatch": "swatch-rural",
+        "icon": "🪵",
+        "img": "https://lh3.googleusercontent.com/d/1HorIs7oMvQV-KQtgqmBYs9oJkwXW-CUk"
+      },
+      {
+        "style": "modern",
+        "name": "בטון מוחלק",
+        "desc": "יציקת בטון חלקה ואחידה, בגוון אפור בהיר, ללא פגמים",
+        "swatch": "swatch-modern",
+        "icon": "⬜",
+        "img": "https://lh3.googleusercontent.com/d/1EptTpA_a_H6QdXNxVviNvikOSNy6QGX-"
+      },
+      {
+        "style": "scandi",
+        "name": "פרקט לבן בהיר",
+        "desc": "קרשי עץ או דמוי עץ בגוון בהיר מאוד, קווים ישרים ונקיים",
+        "swatch": "swatch-scandi",
+        "icon": "🪨",
+        "img": "https://lh3.googleusercontent.com/d/1IVxy9psLwRiHEu-OMvukT3GuDsRTXunz"
+      }
+    ]
+  },
+  {
+    "category": "פלטת צבעים",
+    "title": "איזה שילוב צבעים הכי מדבר אליכם?",
+    "options": [
+      {
+        "style": "desert",
+        "name": "גוונים חמים",
+        "desc": "חמרה, אוקר, שמנת, טרה קוטה — צבעי אדמה עם נגיעות כחול",
+        "swatch": "swatch-desert",
+        "icon": "🌅",
+        "img": "https://lh3.googleusercontent.com/d/1wh0hPi0a2OwRXLfpfM2rC3EUIgZdpJcd"
+      },
+      {
+        "style": "rural",
+        "name": "ירוק וחרדל",
+        "desc": "ירוקים עמוקים, חרדל, חום עץ ושמנת — צבעי טבע ופשטות",
+        "swatch": "swatch-rural",
+        "icon": "🍃",
+        "img": "https://lh3.googleusercontent.com/d/17mDGUdUo6OuiQPdDX39b84QgTtGSIt0w"
+      },
+      {
+        "style": "modern",
+        "name": "אפור ופחם",
+        "desc": "גוונים של אפור, שחור מט ולבן — פלטה נייטרלית ועקרונית",
+        "swatch": "swatch-modern",
+        "icon": "🩶",
+        "img": "https://lh3.googleusercontent.com/d/1kv6sxD9_cEzB_MOPM9raECj483F4mH67"
+      },
+      {
+        "style": "scandi",
+        "name": "לבן ובז׳ עדין",
+        "desc": "לבן, אפור בהיר, ורוד עפרוני — פסטל שקט ומרגיע",
+        "swatch": "swatch-scandi",
+        "icon": "🤍",
+        "img": "https://lh3.googleusercontent.com/d/1Lr_XEgNFL9Ehj6wDJEl4UziQgnAwi74d"
+      }
+    ]
+  },
+  {
+    "category": "מטבח",
+    "title": "דמיינו את מטבח החלומות שלכם — למה הוא הכי דומה?",
+    "options": [
+      {
+        "style": "desert",
+        "name": "מטבח ים תיכוני",
+        "desc": "שילוב ארונות ומדפים פתוחים, נגיעות צבע, יציאה לגינת תבלינים",
+        "swatch": "swatch-desert",
+        "icon": "🫙",
+        "img": "https://lh3.googleusercontent.com/d/1svVZSLeA9GKAjCyxpClqryzyFM6T7P53"
+      },
+      {
+        "style": "rural",
+        "name": "מטבח כפרי",
+        "desc": "ארונות עץ מלא כיור קדמי, מדפים פתוחים עם כלי חרס",
+        "swatch": "swatch-rural",
+        "icon": "🪴",
+        "img": "https://lh3.googleusercontent.com/d/1IN-dT-faiXu-OqA7N_1xaTJof4u30_40"
+      },
+      {
+        "style": "modern",
+        "name": "מטבח חלק",
+        "desc": "ארונות לכה מט ללא ידיות, משטח בטון או קוריאן, קו ישר מוחלט",
+        "swatch": "swatch-modern",
+        "icon": "🔲",
+        "img": "https://lh3.googleusercontent.com/d/12rkMBtpynIety09ZtOW37Hqbi8MqDY56"
+      },
+      {
+        "style": "scandi",
+        "name": "מטבח נורדי",
+        "desc": "ארונות עץ בגוון בהיר, משטח שיש לבן, מדפים פתוחים עם צמחים",
+        "swatch": "swatch-scandi",
+        "icon": "🌱",
+        "img": "https://lh3.googleusercontent.com/d/1oku4nBATgx7Bg0beVWVXRnCYwIg3xVHA"
+      }
+    ]
+  },
+  {
+    "category": "חדר שינה",
+    "title": "בחדר שינה — מה הכי מרגיע?",
+    "options": [
+      {
+        "style": "desert",
+        "name": "קווים רכים",
+        "desc": "קיר מסוייד בלבן חם, הלבשה מחומרים טבעיים, תאורה טבעית",
+        "swatch": "swatch-desert",
+        "icon": "🕯️",
+        "img": "https://lh3.googleusercontent.com/d/1bSXSzoB6maXSk5AzxaF0dqVzuE5RqQzG"
+      },
+      {
+        "style": "rural",
+        "name": "נוחות נוסטלגית",
+        "desc": "עץ ואבן חשופה, מיטה עם פיתוחי מתכת, פרחים",
+        "swatch": "swatch-rural",
+        "icon": "🛏️",
+        "img": "https://lh3.googleusercontent.com/d/1lx188u0jaWrTfN1ddfioJHk917ZRQs86"
+      },
+      {
+        "style": "modern",
+        "name": "פלטפורמה נמוכה",
+        "desc": "מיטת פלטפורמה צפה עם ראש מיטה מרופד באפור, תאורה מחושבת",
+        "swatch": "swatch-modern",
+        "icon": "▭",
+        "img": "https://lh3.googleusercontent.com/d/1tyy2EjVJKsxFPP5lGCve_eJRMaaaRte6"
+      },
+      {
+        "style": "scandi",
+        "name": "לבן ועץ",
+        "desc": "מסגרת מיטה מעץ בהיר, שמיכת פוך לבנה ענקית, נר ריחני",
+        "swatch": "swatch-scandi",
+        "icon": "✨",
+        "img": "https://lh3.googleusercontent.com/d/15Z7bM3D3f0Uizup0ZcVI1i5JE3jZSKBx"
+      }
+    ]
+  },
+  {
+    "category": "אור וחלונות",
+    "title": "איזה יחס לאור ולחלונות מתאים לכם?",
+    "options": [
+      {
+        "style": "desert",
+        "name": "חלונות קשת מוצלים",
+        "desc": "חלונות קשת מוגנים מהשמש, תריסים עץ ועיצוב כדי להגן מהחום",
+        "swatch": "swatch-desert",
+        "icon": "☀️",
+        "img": "https://lh3.googleusercontent.com/d/151lZYC5sJLqa9jIPKtYaevPbOZT3t2B3"
+      },
+      {
+        "style": "rural",
+        "name": "חלונות עץ קטנים",
+        "desc": "זכוכית עם חלוקה, תריסי עץ ואדניות לצמחים, וילון תחרה לאור רך",
+        "swatch": "swatch-rural",
+        "icon": "🌤️",
+        "img": "https://lh3.googleusercontent.com/d/1N1tRHED-QI6VpfjCNOtYIFsQ5I_tfRzP"
+      },
+      {
+        "style": "modern",
+        "name": "קיר שלם זכוכית",
+        "desc": "חלון גדול מרצפה לתקרה, ללא מסגרות, שמיים כנוף",
+        "swatch": "swatch-modern",
+        "icon": "🔵",
+        "img": "https://lh3.googleusercontent.com/d/1xqnCbRFlxRvGwXzqoePcxu9ky_wP_XWw"
+      },
+      {
+        "style": "scandi",
+        "name": "חלונות רחבים לצפון",
+        "desc": "חלונות גדולים לאור עדין, וילונות שיפון לבנים, אור מפוזר",
+        "swatch": "swatch-scandi",
+        "icon": "🌥️",
+        "img": "https://lh3.googleusercontent.com/d/1UqDqHzZ10o478OTXgXwBMg2G9UBhfcY4"
+      }
+    ]
+  },
+  {
+    "category": "חומרים",
+    "title": "איזה חומר הכי מדבר אליכם?",
+    "options": [
+      {
+        "style": "desert",
+        "name": "אבן גיר וחול",
+        "desc": "אבן גיר או חול טבעית, מרקם מחוספס שמגע בו מרגיע",
+        "swatch": "swatch-desert",
+        "icon": "🪨",
+        "img": "https://lh3.googleusercontent.com/d/14BsfGd6cOv7c3R6bjxPJjR3ZTAbL-l-B"
+      },
+      {
+        "style": "rural",
+        "name": "עץ מלא ותיק",
+        "desc": "עץ ישן עם עורקים בולטים וביקוע, צבע בינוני כהה",
+        "swatch": "swatch-rural",
+        "icon": "🪵",
+        "img": "https://lh3.googleusercontent.com/d/1jDWDBRgovocwREaAVP6vw9Q2OzELeylU"
+      },
+      {
+        "style": "modern",
+        "name": "בטון וברזל",
+        "desc": "בטון גולמי, ברזל מגולוון, זכוכית — חומרים תעשייתיים וחזקים",
+        "swatch": "swatch-modern",
+        "icon": "⚙️",
+        "img": "https://lh3.googleusercontent.com/d/10n03BW7T6cUBE7eH2LuyiQIiK31uu7LJ"
+      },
+      {
+        "style": "scandi",
+        "name": "כותנה טבעית",
+        "desc": "כותנה על הגבעול, רכות טבעית ופשוטה",
+        "swatch": "swatch-scandi",
+        "icon": "🐑",
+        "img": "https://lh3.googleusercontent.com/d/1cH3o58vnyCG06zUUqvo1Ij2jlyiOpRCl"
+      }
+    ]
+  },
+  {
+    "category": "גינה ומרפסת",
+    "title": "מה תרצו לראות כשתפתחו דלת לחוץ?",
+    "options": [
+      {
+        "style": "desert",
+        "name": "חצר פנימית מוצלת",
+        "desc": "פרגולה, עץ זית או תאנה, אופציות שונות לישיבה",
+        "swatch": "swatch-desert",
+        "icon": "⛲",
+        "img": "https://lh3.googleusercontent.com/d/1x_0pJ2rjrIkWM2WeT1yC4T8_J36HZaon"
+      },
+      {
+        "style": "rural",
+        "name": "גינת ירק ועשבים",
+        "desc": "ערוגות ירק, שולחן עץ, גפן מטפסת ועציצי עשבי תיבול",
+        "swatch": "swatch-rural",
+        "icon": "🌱",
+        "img": "https://lh3.googleusercontent.com/d/1WYK1uTjlWjIhlMDvi_rerC0f316vD9Po"
+      },
+      {
+        "style": "modern",
+        "name": "זן עכשוי",
+        "desc": "צמחיה מסודרת וקלה לתחזוק, ספת חוץ ופרגולת מתכת",
+        "swatch": "swatch-modern",
+        "icon": "🌿",
+        "img": "https://lh3.googleusercontent.com/d/1ggc0BGcFTaUcoV8ru0M1hiVW8YI-YCem"
+      },
+      {
+        "style": "scandi",
+        "name": "דק עץ",
+        "desc": "מרפסת מעץ אלון, כורסת ערסל, שמיכה ומדורה בחורף",
+        "swatch": "swatch-scandi",
+        "icon": "🔥",
+        "img": "https://lh3.googleusercontent.com/d/1-TKYiLfPb81Z3ArdUgfozCSCez-NrySL"
+      }
+    ]
+  },
+  {
+    "category": "חופשה",
+    "title": "מה היא חופשת החלומות שלכם?",
+    "options": [
+      {
+        "style": "desert",
+        "name": "יוון/ מרוקו",
+        "desc": "מרגיש כמו בבית אבל בכל זאת אחר",
+        "swatch": "swatch-desert",
+        "icon": "🛋️",
+        "img": "https://lh3.googleusercontent.com/d/13SO0Lqxa0rYxSYGWPhZXFBm6CCgx29Lo"
+      },
+      {
+        "style": "rural",
+        "name": "איטליה/ צרפת",
+        "desc": "אוכל והיסטוריה קלאסיים ואינטימיים",
+        "swatch": "swatch-rural",
+        "icon": "🪑",
+        "img": "https://lh3.googleusercontent.com/d/1f6emP55Qy_CA5idZHoN2TlWlomz55UGE"
+      },
+      {
+        "style": "modern",
+        "name": "ניו יורק/ טוקיו",
+        "desc": "שופינג ותרבות בעיר אמיתית",
+        "swatch": "swatch-modern",
+        "icon": "🖤",
+        "img": "https://lh3.googleusercontent.com/d/1Gw1qekfWCkxZ8gqJqJAIgg1BmyelTccp"
+      },
+      {
+        "style": "scandi",
+        "name": "איסלנד/ אלסקה",
+        "desc": "אורות הצפון וטבע פראי",
+        "swatch": "swatch-scandi",
+        "icon": "🥚",
+        "img": "https://lh3.googleusercontent.com/d/1J9eKQc9nlkYNNwDiaNYgF9R1PM-cTJTc"
+      }
+    ]
+  },
+  {
+    "category": "אמבטיה",
+    "title": "חדר האמבטיה האידיאלי שלכם נראה כך:",
+    "options": [
+      {
+        "style": "desert",
+        "name": "בנוי וזורם",
+        "desc": "מקלחון בנוי, אריחים צבעוניים, תחושה של מקלחת חוץ בחופשה",
+        "swatch": "swatch-desert",
+        "icon": "🏺",
+        "img": "https://lh3.googleusercontent.com/d/1rCjDtqbBCNKDyZl_GznIjARCpWkhLa5Q"
+      },
+      {
+        "style": "rural",
+        "name": "חווית חווה",
+        "desc": "אמבטיה מונחת עם אלמנטי ברזל, אריחי אבן, מגבת פשתן",
+        "swatch": "swatch-rural",
+        "icon": "🪣",
+        "img": "https://lh3.googleusercontent.com/d/1t4uxfagfULuTmJR1teGj2ZjwF7LO3fh7"
+      },
+      {
+        "style": "modern",
+        "name": "שיש ובטון",
+        "desc": "קירות שיש, ברז מינימל שחור מט, מקלחון זכוכית ללא מסגרת",
+        "swatch": "swatch-modern",
+        "icon": "🚿",
+        "img": "https://lh3.googleusercontent.com/d/15ykyri3ZvEvuXjiKth9QbnIy6x9X44fr"
+      },
+      {
+        "style": "scandi",
+        "name": "לבן ומנחם",
+        "desc": "קירות לבן מט, ריצוף עץ טיק, מגבות קרם, אור נרות",
+        "swatch": "swatch-scandi",
+        "icon": "🕯️",
+        "img": "https://lh3.googleusercontent.com/d/1HXvkIRphWvSvUS4N4HpWRQ5G7IQhDV5w"
+      }
+    ]
+  },
+  {
+    "category": "עונה",
+    "title": "לאיזו עונה אתם מחכים כל השנה?",
+    "options": [
+      {
+        "style": "desert",
+        "name": "קיץ",
+        "desc": "מתי שקורים כל הדברים הטובים",
+        "swatch": "swatch-desert",
+        "icon": "🕌",
+        "img": "https://lh3.googleusercontent.com/d/1miJaZWGakmM8lFiELuroBtjXlyYwAGYX"
+      },
+      {
+        "style": "rural",
+        "name": "אביב",
+        "desc": "הכל פורח, מה יש לא לאהוב?",
+        "swatch": "swatch-rural",
+        "icon": "🪔",
+        "img": "https://lh3.googleusercontent.com/d/1Z5Js572vhNfPo8hm4wceiu3-CF_x91i_"
+      },
+      {
+        "style": "modern",
+        "name": "סתיו",
+        "desc": "עונה מושלמת, חבל שהיא כל כך קצרה!",
+        "swatch": "swatch-modern",
+        "icon": "💡",
+        "img": "https://lh3.googleusercontent.com/d/1wiJq6lqBOFtSqHZ8gLo-kCZSB3EpYc_8"
+      },
+      {
+        "style": "scandi",
+        "name": "חורף",
+        "desc": "סוף סוף אפשר לנשום",
+        "swatch": "swatch-scandi",
+        "icon": "✨",
+        "img": "https://lh3.googleusercontent.com/d/1sn30ZXYcST4VvTKmjlJhSudHlamlQ7gq"
+      }
+    ]
+  },
+  {
+    "category": "אמנות ועיצוב",
+    "title": "איזה פריט אמנות הייתם שמחים לראות בביתכם?",
+    "options": [
+      {
+        "style": "desert",
+        "name": "חרס בעבודת יד",
+        "desc": "אוסף כלי חרס מסורתיים, שטיח ברבר",
+        "swatch": "swatch-desert",
+        "icon": "🏺",
+        "img": "https://lh3.googleusercontent.com/d/1YqhWAj6NVwyVQqORQfrafJzmQ90R8dU3"
+      },
+      {
+        "style": "rural",
+        "name": "תמונת צבעי שמן",
+        "desc": "ציור טבע בצבעי שמן, מסגרת קלאסית",
+        "swatch": "swatch-rural",
+        "icon": "🖼️",
+        "img": "https://lh3.googleusercontent.com/d/1e1HctG1v-LP7cbfrS5Qx5YNkguU-uGtS"
+      },
+      {
+        "style": "modern",
+        "name": "הדפס גיאומטרי שחור",
+        "desc": "הדפס גיאומטרי מונוכרומטי, מסגרת מינימלית",
+        "swatch": "swatch-modern",
+        "icon": "▪️",
+        "img": "https://lh3.googleusercontent.com/d/1wof9RSYvlPSIx93gUgB1F0VJ9-vvYEBh"
+      },
+      {
+        "style": "scandi",
+        "name": "פוסטר בוטני",
+        "desc": "פוסטר צמחים בוטני, מסגרת עץ בהיר",
+        "swatch": "swatch-scandi",
+        "icon": "🌿",
+        "img": "https://lh3.googleusercontent.com/d/1jqTpVHRPawpe2bG2XtXKviPMiGV1brWw"
+      }
+    ]
+  },
+  {
+    "category": "אורח חיים",
+    "title": "בשבת בבוקר — היכן אתם רוצים לשתות קפה?",
+    "options": [
+      {
+        "style": "desert",
+        "name": "חצר פנימית בצל",
+        "desc": "חצר פנימית, כיסאות מרוקאים, קפה תורכי, שמש ים תיכוני",
+        "swatch": "swatch-desert",
+        "icon": "☕",
+        "img": "https://lh3.googleusercontent.com/d/1fYAUhzB7JFnaGQLf6aGT3hWPh1p8u6WF"
+      },
+      {
+        "style": "rural",
+        "name": "מרפסת עם נוף לשדה",
+        "desc": "שולחן עץ ישן, כוס חרס, ציפורים, גינה פורחת בחוץ",
+        "swatch": "swatch-rural",
+        "icon": "🌄",
+        "img": "https://lh3.googleusercontent.com/d/1td8jio8ycWzlmAfMubk10-uSB3nILDYK"
+      },
+      {
+        "style": "modern",
+        "name": "בר מטבח עם נוף",
+        "desc": "על כיסא גבוה ליד דלפק, עם נוף לחוץ דרך קיר הזכוכית",
+        "swatch": "swatch-modern",
+        "icon": "🌆",
+        "img": "https://lh3.googleusercontent.com/d/1efBWNJKcJu5M_N85hgpgp7fOMS9YAs03"
+      },
+      {
+        "style": "scandi",
+        "name": "פינת Hygge",
+        "desc": "שמיכה על הכורסה, נר, ספר ומוסיקה — פינה פנימית חמימה",
+        "swatch": "swatch-scandi",
+        "icon": "🕯️",
+        "img": "https://lh3.googleusercontent.com/d/1K2VyhoalvCsenG2_bit7IPOJnsakdc4U"
+      }
+    ]
+  },
+  {
+    "category": "ארגון ואחסון",
+    "title": "איך אתם מעדיפים לארגן את החפצים בבית?",
+    "options": [
+      {
+        "style": "desert",
+        "name": "כחלק מהקיר",
+        "desc": "נישוי בנויות אולי עם מדפי עץ, סלי קש לאחסון סגור",
+        "swatch": "swatch-desert",
+        "icon": "🧺",
+        "img": "https://lh3.googleusercontent.com/d/1H-nVsSHdAkBbXxZuSGe0N6rxjD76XFtR"
+      },
+      {
+        "style": "rural",
+        "name": "ארון תצוגה עם אופי",
+        "desc": "ויטרינת עץ חלקה פתוחה לפרטי נוי ואוספים וחלקה סגורה",
+        "swatch": "swatch-rural",
+        "icon": "📚",
+        "img": "https://lh3.googleusercontent.com/d/1-yHbQFDfNkdBAPFcQdljE3qx2w2kqLtA"
+      },
+      {
+        "style": "modern",
+        "name": "ארון קיר נסתר",
+        "desc": "פנל קיר שלם ללא ידיות, ארון נסתר, סדר מוחלט",
+        "swatch": "swatch-modern",
+        "icon": "🗄️",
+        "img": "https://lh3.googleusercontent.com/d/1SXjQLZ53_71ma0yhlCSnSyLmnfGw94Sv"
+      },
+      {
+        "style": "scandi",
+        "name": "מדפי עץ צפים",
+        "desc": "מדף עץ בהיר פתוחים לעציצים, קופסאות לבד מסודרות לאחסון סגור",
+        "swatch": "swatch-scandi",
+        "icon": "📦",
+        "img": "https://lh3.googleusercontent.com/d/13glkK7leI0KQjQP_6ywEF11fk3q9rlwT"
+      }
+    ]
+  },
+  {
+    "category": "פיצ'ר",
+    "title": "אפשר לבחור רק אחד:",
+    "options": [
+      {
+        "style": "desert",
+        "name": "פטיו/ מרפת פנימית",
+        "desc": "עוד מרפסת, הרי חיים בחוץ",
+        "swatch": "swatch-desert",
+        "icon": "🏡",
+        "img": "https://lh3.googleusercontent.com/d/1u-tTboiZ7iMecUs6gdiGYS6vbVISyqgK"
+      },
+      {
+        "style": "rural",
+        "name": "מזווה בנוי",
+        "desc": "חדר אחסון שלם כתוספת למטבח",
+        "swatch": "swatch-rural",
+        "icon": "🌳",
+        "img": "https://lh3.googleusercontent.com/d/1uy3Am6SUFqpZJGGnqXM-HhDVBw96ZyXx"
+      },
+      {
+        "style": "modern",
+        "name": "חדר רטוב",
+        "desc": "מקלחת משולבת עם כל הפינוקים באווירת ספא",
+        "swatch": "swatch-modern",
+        "icon": "🏗️",
+        "img": "https://lh3.googleusercontent.com/d/19NDrGz9WT_3vtX5d8uwVMID-Wb7Ceqce"
+      },
+      {
+        "style": "scandi",
+        "name": "ספסל חלון",
+        "desc": "ספסל בנוי או נגרות להתכרבל בו עם ספר טוב",
+        "swatch": "swatch-scandi",
+        "icon": "🏠",
+        "img": "https://lh3.googleusercontent.com/d/1ofoOsM6gk9-LXPLe9I-iSJaHK0FI8sNn"
+      }
+    ]
+  },
+  {
+    "category": "חלוקת חללים",
+    "title": "איך אתם מדמיינים את הזרימה בבית המושלם?",
+    "options": [
+      {
+        "style": "desert",
+        "name": "הפרדה חלקית בין חללים",
+        "desc": "הפרדה מבנית מסויימת ליצירת חללים אינטימיים",
+        "swatch": "swatch-desert",
+        "icon": "🟫",
+        "img": "https://lh3.googleusercontent.com/d/1TDdXQogJEEnuhuSkm4ZCZicGVvvByeeS"
+      },
+      {
+        "style": "rural",
+        "name": "הפרדה מוחלטת בין חללים",
+        "desc": "לכל חדר השימוש שלו",
+        "swatch": "swatch-rural",
+        "icon": "🟩",
+        "img": "https://lh3.googleusercontent.com/d/1Gx-EvllvlTT5WcE7JyBQghUaNkmFnXoi"
+      },
+      {
+        "style": "modern",
+        "name": "ללא הפרדה כלל",
+        "desc": "חלל אחד פתוח, זרימה מוחלטת",
+        "swatch": "swatch-modern",
+        "icon": "⬛",
+        "img": "https://lh3.googleusercontent.com/d/1C0lbSXg4D9rFdYk3JqNnwTTGoBRNNcUn"
+      },
+      {
+        "style": "scandi",
+        "name": "הפרדה עיצובית",
+        "desc": "הפרדה על ידי אלמנט עיצובי שמכניס אור ושומר על קשר אבל מסמן את המרחב",
+        "swatch": "swatch-scandi",
+        "icon": "⬜",
+        "img": "https://lh3.googleusercontent.com/d/1STMg5oTp05ke0KIp9-oakm8-sdDtqPEU"
+      }
+    ]
+  },
+  {
+    "category": "גג ותקרה",
+    "title": "מה הוא סגנון הגג האידאלי?",
+    "options": [
+      {
+        "style": "desert",
+        "name": "גגג שטוח",
+        "desc": "גג שטוח עם מעקה גג וקורות חודרות",
+        "swatch": "swatch-desert",
+        "icon": "🕌",
+        "img": "https://lh3.googleusercontent.com/d/1FTbakE2TVLvfRsi9AlD-m34xJsgOy2wP"
+      },
+      {
+        "style": "rural",
+        "name": "גג רעפים קלאסי",
+        "desc": "גג רעפים משופע עם ארובה",
+        "swatch": "swatch-rural",
+        "icon": "🏘️",
+        "img": "https://lh3.googleusercontent.com/d/1MJGfT4dTNmkq_uhjKP7-EWcdeBzZrSj4"
+      },
+      {
+        "style": "modern",
+        "name": "גג מתקדם",
+        "desc": "שיפוע אחד מחומר מתקדם - פאנל או אלומינים",
+        "swatch": "swatch-modern",
+        "icon": "🌃",
+        "img": "https://lh3.googleusercontent.com/d/1zoqwx_j7AFiumsfoZlOw7HhTLvPoQ6V_"
+      },
+      {
+        "style": "scandi",
+        "name": "גג משופע עץ",
+        "desc": "גג משופע עם עץ חשוף פנימי, חלון גג — אור ואינטימיות",
+        "swatch": "swatch-scandi",
+        "icon": "🌲",
+        "img": "https://lh3.googleusercontent.com/d/1MyQJtQ6G3Dngz55yh53pXheS2H1WgX3F"
+      }
+    ]
+  },
+  {
+    "category": "תקרה",
+    "title": "ואיך נראית התקרה מבפנים",
+    "options": [
+      {
+        "style": "desert",
+        "name": "תקרה במראה בוץ",
+        "desc": "תקרה שוחה עם קורות עץ במראה טבעי",
+        "swatch": "swatch-desert",
+        "icon": "🌊",
+        "img": "https://lh3.googleusercontent.com/d/1rSRdd5EFvM-utxic3EvdapD99LkQ7Sxv"
+      },
+      {
+        "style": "rural",
+        "name": "עץ משופע",
+        "desc": "תקרת עץ משופעת, קורות עם נוכחות",
+        "swatch": "swatch-rural",
+        "icon": "🌻",
+        "img": "https://lh3.googleusercontent.com/d/1KN1Bgi7Jj0-fIOggmiPAf2OiQYs9gc2V"
+      },
+      {
+        "style": "modern",
+        "name": "תקרה שטוחה ונקייה",
+        "desc": "עם הנמכות גבס לתאורה ומיזוג",
+        "swatch": "swatch-modern",
+        "icon": "🏙️",
+        "img": "https://lh3.googleusercontent.com/d/1aHKnCgv-yfaHaEzfi86nPWWzbisvoiiR"
+      },
+      {
+        "style": "scandi",
+        "name": "תקרת עץ בהיר גבוהה",
+        "desc": "תקרה גבוהה מעץ בהיר שנותנת תחשות מרחב ונשימה גם לחללים קטנים",
+        "swatch": "swatch-scandi",
+        "icon": "🏔️",
+        "img": "https://lh3.googleusercontent.com/d/1SNngvpKjINa8U1vPqkMiV94OA0s4ERZJ"
+      }
+    ]
+  },
+  {
+    "category": "צמחי בית",
+    "title": "רוצים צמחים צמחים בבית?",
+    "options": [
+      {
+        "style": "desert",
+        "name": "סקולנטים של בית",
+        "desc": "צמחי אוויר על ענפים טבעיים או טרריום",
+        "swatch": "swatch-desert",
+        "icon": "🧿",
+        "img": "https://lh3.googleusercontent.com/d/1cSl3uNJmyLuXRebINYqXOxMJlk_hhtNG"
+      },
+      {
+        "style": "rural",
+        "name": "שלל עציצים",
+        "desc": "עציצים וייחורים בבית ובמרפסת איפה שרק אפשר",
+        "swatch": "swatch-rural",
+        "icon": "💐",
+        "img": "https://lh3.googleusercontent.com/d/1LOYO6IBQp1Jkwugw5Z0CCjqW0xy6zjwm"
+      },
+      {
+        "style": "modern",
+        "name": "פרחים מינימליסטיים",
+        "desc": "סחלבים, או משהו באסטתיקה יפנית - נקי אך מיוחד",
+        "swatch": "swatch-modern",
+        "icon": "🔶",
+        "img": "https://lh3.googleusercontent.com/d/1txcoF7CAtkaRWmWca3oJCRQxJHOxw3U0"
+      },
+      {
+        "style": "scandi",
+        "name": "סידורים מיובשים",
+        "desc": "פרחים וענפים מיובשים בכלים תואמים",
+        "swatch": "swatch-scandi",
+        "icon": "🕯️",
+        "img": "https://lh3.googleusercontent.com/d/16sCj-fF5VoBOIHogOiu39dC0VNuAGi8g"
+      }
+    ]
+  },
+  {
+    "category": "הרגשה",
+    "title": "בסוף יום ארוך, איך אתם רוצים שביתכם יגרום לכם להרגיש?",
+    "options": [
+      {
+        "style": "desert",
+        "name": "נווה מדבר",
+        "desc": "תחושה של שחרור ונשימה, ריח של אדמה ושמש",
+        "swatch": "swatch-desert",
+        "icon": "🌞",
+        "img": "https://lh3.googleusercontent.com/d/1ejqw1LmS1F5Wz7hyQTCyOmvpIYxiBf0C"
+      },
+      {
+        "style": "rural",
+        "name": "שורשים והמשכיות",
+        "desc": "תחושת שייכות עמוקה לאדמה, משפחה, טבע וזמן איטי",
+        "swatch": "swatch-rural",
+        "icon": "🌳",
+        "img": "https://lh3.googleusercontent.com/d/1lFfTy5ZW6KcVto0H_-qiZ_SqfZYBT29t"
+      },
+      {
+        "style": "modern",
+        "name": "דף חלק",
+        "desc": "כל דבר במקומו, חלל שמאפשר מחשבה בהירה, שקט ויעילות",
+        "swatch": "swatch-modern",
+        "icon": "💎",
+        "img": "https://lh3.googleusercontent.com/d/17ukMpUF0BPzAh7ezMkAXWTNwTtoBT8KF"
+      },
+      {
+        "style": "scandi",
+        "name": "חיבוק ושלווה",
+        "desc": "תחושה חמימה ושקט נפשי - בית שמחבק אתכם ",
+        "swatch": "swatch-scandi",
+        "icon": "🤍",
+        "img": "https://lh3.googleusercontent.com/d/1cXXWZuDudMjW0BsVY3aE_JSfFxP2Rza3"
+      }
+    ]
+  }
+];
+
+// ── QUIZ STATE ───────────────────────────────────────────────────────
+let currentQ = 0, answers = {};
+
+// ── SHUFFLE ──────────────────────────────────────────────────────────
+// סדר האפשרויות מעורבב פעם אחת כשמתחילים שאלון חדש, ונשמר לאורך כל השאלון
+let shuffledOrders = []; // מערך של מערכי אינדקסים — אחד לכל שאלה
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function buildShuffledOrders() {
+  shuffledOrders = QUESTIONS.map(q => shuffle(q.options.map((_, i) => i)));
+}
+
+function startQuiz() {
+  buildShuffledOrders();
+  document.getElementById('screen-intro').classList.remove('active');
+  document.getElementById('screen-question').classList.add('active');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[currentQ];
+  document.getElementById('qCategory').textContent = q.category;
+  document.getElementById('qTitle').textContent = q.title;
+  const grid = document.getElementById('optionsGrid');
+  grid.innerHTML = '';
+  // מציגים לפי הסדר המעורבב של השאלה הנוכחית
+  const order = shuffledOrders[currentQ] || q.options.map((_,i) => i);
+  order.forEach(oi => {
+    const opt = q.options[oi];
+    const card = document.createElement('div');
+    card.className = 'option-card' + (answers[currentQ] === opt.style ? ' selected' : '');
+    card.dataset.style = opt.style;
+    card.onclick = () => selectOption(opt.style, card);
+    const swatchInner = opt.img
+      ? `<img class="swatch-img" src="${opt.img}" alt="${opt.name}"><span class="swatch-label" style="position:relative;z-index:3;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.9)">${opt.name}</span>`
+      : `<div class="pattern"></div><span class="swatch-icon">${opt.icon}</span><span class="swatch-label">${opt.name}</span>`;
+    card.innerHTML = `
+      <div class="check-icon"><svg viewBox="0 0 14 14"><polyline points="2,7 5.5,10.5 12,3.5"/></svg></div>
+      <div class="style-swatch ${opt.swatch}" style="${opt.img ? 'background:#333' : ''}">${swatchInner}</div>
+      <div class="option-body">
+        <div class="option-name">${opt.name}</div>
+        <div class="option-desc">${opt.desc}</div>
+      </div>`;
+    grid.appendChild(card);
+  });
+  const pct = Math.round((currentQ / QUESTIONS.length) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `שאלה ${currentQ+1} מתוך ${QUESTIONS.length}`;
+  const btnNext = document.getElementById('btnNext');
+  btnNext.classList.toggle('enabled', !!answers[currentQ]);
+  btnNext.textContent = currentQ === QUESTIONS.length-1 ? 'לתוצאות ←' : 'המשך ←';
+  document.querySelector('.btn-back').style.visibility = currentQ === 0 ? 'hidden' : 'visible';
+}
+
+function selectOption(style, card) {
+  answers[currentQ] = style;
+  document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  document.getElementById('btnNext').classList.add('enabled');
+}
+
+// ── GOOGLE SHEETS WEBHOOK ────────────────────────────────────────────
+// הדביקו כאן את כתובת ה-Web App שקיבלתם מ-Google Apps Script (ראו הוראות ההגדרה)
+const SHEETS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbw7L2ZZcHhbesUpTciO-xesS1eSwjaTDhCw1DIbCKlf9wBWyEiEylVmgq-7RdVvi8jG/exec';
+
+let lastResultData = null; // נשמר לטובת שיתוף/דיבוג
+
+function nextQuestion() {
+  if (!answers[currentQ]) return;
+  if (currentQ < QUESTIONS.length-1) { currentQ++; renderQuestion(); window.scrollTo({top:0,behavior:'smooth'}); }
+  else showLeadScreen();
+}
+
+function prevQuestion() {
+  if (currentQ > 0) { currentQ--; renderQuestion(); window.scrollTo({top:0,behavior:'smooth'}); }
+}
+
+function showLeadScreen() {
+  document.getElementById('screen-question').classList.remove('active');
+  document.getElementById('screen-lead').classList.add('active');
+  document.getElementById('progressFill').style.width = '95%';
+  document.getElementById('progressText').textContent = 'כמעט שם!';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function submitLead() {
+  const name = document.getElementById('leadName').value.trim();
+  const contact = document.getElementById('leadContact').value.trim();
+  const errEl = document.getElementById('leadError');
+
+  if (!name || !contact) {
+    errEl.textContent = 'נא למלא שם ופרטי קשר כדי לקבל את התוצאות';
+    return;
+  }
+  errEl.textContent = '';
+
+  document.getElementById('screen-lead').classList.remove('active');
+  showResults(name, contact);
+}
+
+function showResults(leadName, leadContact) {
+  document.getElementById('screen-results').classList.add('active');
+  document.getElementById('progressFill').style.width = '100%';
+  document.getElementById('progressText').textContent = 'הושלם!';
+  window.scrollTo({top:0,behavior:'smooth'});
+  const scores = {desert:0,rural:0,modern:0,scandi:0};
+  Object.values(answers).forEach(s => scores[s]++);
+  const winner = Object.entries(scores).sort((a,b)=>b[1]-a[1])[0][0];
+  const total = Object.values(scores).reduce((a,b)=>a+b,0);
+  const style = STYLES[winner];
+  document.getElementById('resultTitle').textContent = 'הסגנון שלכם נחשף!';
+  document.getElementById('resultSubtitle').textContent = 'בהתבסס על תשובותיכם, זיהינו את הסגנון שהכי מדבר אליכם';
+  document.getElementById('resultBanner').style.background = style.gradients;
+  document.getElementById('resultEmoji').textContent = style.emoji;
+  document.getElementById('resultStyleName').textContent = style.name;
+  document.getElementById('resultDesc').textContent = style.desc;
+  document.getElementById('resultTraits').innerHTML = style.traits.map(t=>`<span class="trait-tag" style="background:${style.tagBg};color:${style.tagColor}">${t}</span>`).join('');
+  document.getElementById('resultPalette').innerHTML = '<span class="result-palette-label">פלטת צבעים:</span>'+style.palette.map(c=>`<div class="palette-dot" style="background:${c}"></div>`).join('');
+  const scoresSorted = Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+  document.getElementById('scoresBars').innerHTML = scoresSorted.map(([key,count])=>{
+    const s=STYLES[key], pct=Math.round((count/total)*100);
+    return `<div class="score-row"><div class="score-name">${s.emoji} ${s.name}</div><div class="score-bar-bg"><div class="score-bar-fill" style="width:${pct}%;background:${s.color}"></div></div><div class="score-pct">${pct}%</div></div>`;
+  }).join('');
+
+  // בניית אובייקט הנתונים לשליחה
+  const percentages = {};
+  scoresSorted.forEach(([key,count]) => { percentages[key] = Math.round((count/total)*100); });
+
+  const answersDetailed = QUESTIONS.map((q, i) => ({
+    question: q.title,
+    category: q.category,
+    chosen_style: answers[i] || null
+  }));
+
+  lastResultData = {
+    timestamp: new Date().toISOString(),
+    name: leadName || '',
+    contact: leadContact || '',
+    winning_style: style.name,
+    winning_style_key: winner,
+    percentages: percentages,
+    answers: answersDetailed
+  };
+
+  sendResultsToSheet(lastResultData);
+}
+
+function sendResultsToSheet(data) {
+  if (!SHEETS_WEBHOOK_URL || SHEETS_WEBHOOK_URL.indexOf('PASTE_YOUR') === 0) {
+    console.warn('Google Sheets webhook לא מוגדר עדיין — הנתונים לא נשלחו.');
+    return;
+  }
+  // no-cors כדי לעבוד מול Apps Script בלי בעיות CORS; אין אישור תשובה אבל השליחה מתבצעת
+  fetch(SHEETS_WEBHOOK_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(data)
+  }).catch(err => console.warn('שגיאה בשליחת הנתונים:', err));
+}
+
+function copyLink() {
+  const url = window.location.href;
+  if (navigator.clipboard) navigator.clipboard.writeText(url).then(()=>showToast('הקישור הועתק! 🔗'));
+  else { const el=document.createElement('textarea'); el.value=url; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); showToast('הקישור הועתק! 🔗'); }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2500);
+}
+
+function restartQuiz() {
+  currentQ=0; answers={}; shuffledOrders=[];
+  document.getElementById('screen-results').classList.remove('active');
+  document.getElementById('screen-lead').classList.remove('active');
+  document.getElementById('leadName').value = '';
+  document.getElementById('leadContact').value = '';
+  document.getElementById('screen-intro').classList.add('active');
+  document.getElementById('progressFill').style.width='0%';
+  document.getElementById('progressText').textContent='';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── EDITOR ───────────────────────────────────────────────────────────
+let activeEditorQ = null;
+
+// ── PASSWORD ─────────────────────────────────────────────────────────
+const EDITOR_PASSWORD = 'עריכה2024'; // ← שנו את הסיסמה כאן
+
+function openEditor() {
+  document.getElementById('pwInput').value = '';
+  document.getElementById('pwError').textContent = '';
+  document.getElementById('pwInput').classList.remove('error');
+  document.getElementById('pwOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('pwInput').focus(), 100);
+}
+
+function checkPassword() {
+  const val = document.getElementById('pwInput').value;
+  if (val === EDITOR_PASSWORD) {
+    closePwModal();
+    document.getElementById('editorOverlay').classList.add('open');
+    document.getElementById('btnOpenEditor').classList.add('active');
+    populateGeneralTab();
+    populateQList();
+  } else {
+    const inp = document.getElementById('pwInput');
+    inp.classList.add('error');
+    document.getElementById('pwError').textContent = 'סיסמה שגויה, נסו שוב';
+    inp.value = '';
+    setTimeout(() => inp.classList.remove('error'), 400);
+  }
+}
+
+function closePwModal() {
+  document.getElementById('pwOverlay').classList.remove('open');
+}
+
+function closeEditor() {
+  document.getElementById('editorOverlay').classList.remove('open');
+  document.getElementById('btnOpenEditor').classList.remove('active');
+}
+
+function closeEditorOnBg(e) {
+  if (e.target === document.getElementById('editorOverlay')) closeEditor();
+}
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.editor-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.editor-section').forEach(s=>s.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+// GENERAL TAB
+function populateGeneralTab() {
+  document.getElementById('fe-badge').value = document.getElementById('edit-badge').textContent;
+  document.getElementById('fe-intro-desc').value = document.getElementById('edit-intro-desc').textContent;
+  document.getElementById('fe-start-btn').value = document.getElementById('edit-start-btn').textContent.replace(' ←','');
+
+  const container = document.getElementById('style-results-fields');
+  container.innerHTML = '';
+  Object.entries(STYLES).forEach(([key, s]) => {
+    const styleColors = {desert:'#C8956C',rural:'#7A9E6B',modern:'#4A6FA5',scandi:'#9B8EA8'};
+    container.innerHTML += `
+      <div style="margin-bottom:20px;padding:14px;background:#F8F7F5;border-radius:10px;border-right:3px solid ${styleColors[key]}">
+        <div style="font-size:13px;font-weight:600;margin-bottom:10px">${s.emoji} ${s.name}</div>
+        <label class="field-label">תיאור תוצאה</label>
+        <textarea class="field-input" id="fe-style-desc-${key}" rows="3">${s.desc}</textarea>
+      </div>`;
+  });
+}
+
+// QUESTIONS TAB
+function populateQList() {
+  const list = document.getElementById('editorQList');
+  list.innerHTML = '';
+  QUESTIONS.forEach((q, i) => {
+    const item = document.createElement('div');
+    item.className = 'q-list-item' + (activeEditorQ === i ? ' active' : '');
+    item.innerHTML = `<span class="q-list-num">${i+1}</span><span class="q-list-text">${q.title}</span>`;
+    item.onclick = () => openQEditor(i);
+    list.appendChild(item);
+  });
+  if (activeEditorQ !== null) renderQEditPanel(activeEditorQ);
+}
+
+function openQEditor(idx) {
+  activeEditorQ = idx;
+  document.querySelectorAll('.q-list-item').forEach((el,i)=>el.classList.toggle('active', i===idx));
+  renderQEditPanel(idx);
+}
+
+function renderQEditPanel(idx) {
+  const q = QUESTIONS[idx];
+  const panel = document.getElementById('editorQPanel');
+  panel.style.display = 'block';
+  const styleColors = {desert:'#C8956C',rural:'#7A9E6B',modern:'#4A6FA5',scandi:'#9B8EA8'};
+
+  panel.innerHTML = `
+    <div class="q-edit-panel">
+      <h4>שאלה ${idx+1}</h4>
+      <div class="field-group">
+        <label class="field-label">קטגוריה</label>
+        <input class="field-input" id="qe-cat" value="${q.category}">
+      </div>
+      <div class="field-group">
+        <label class="field-label">טקסט השאלה</label>
+        <textarea class="field-input" id="qe-title" rows="2">${q.title}</textarea>
+      </div>
+      <div class="options-edit-grid" id="qe-options">
+        ${q.options.map((opt, oi) => `
+          <div class="opt-edit-row">
+            <div class="opt-edit-header">
+              <div class="opt-style-dot" style="background:${styleColors[opt.style]}"></div>
+              <span class="opt-style-label">${opt.style === 'desert' ? 'מדברי/ים תיכוני' : opt.style === 'rural' ? 'כפרי' : opt.style === 'modern' ? 'מודרני' : 'סקנדינבי'}</span>
+            </div>
+            <div class="opt-edit-body">
+              <input class="field-input" id="qe-opt-name-${oi}" placeholder="שם האפשרות" value="${opt.name}">
+              <textarea class="field-input" id="qe-opt-desc-${oi}" rows="2" placeholder="תיאור">${opt.desc}</textarea>
+              <div class="img-upload-row">
+                <div class="img-preview" id="qe-img-preview-${oi}">
+                  ${opt.img ? `<img src="${opt.img}" alt="">` : opt.icon}
+                </div>
+                <button class="btn-upload" onclick="triggerImgUpload(${idx},${oi})">📷 העלאת תמונה</button>
+                <input type="file" accept="image/*" class="file-input-hidden" id="qe-file-${oi}" onchange="handleImgUpload(event,${idx},${oi})">
+                ${opt.img ? `<button class="btn-remove-img" onclick="removeImg(${idx},${oi})">✕ הסר</button>` : ''}
+              </div>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+function triggerImgUpload(qIdx, oIdx) {
+  document.getElementById(`qe-file-${oIdx}`).click();
+}
+
+function handleImgUpload(event, qIdx, oIdx) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    QUESTIONS[qIdx].options[oIdx].img = e.target.result;
+    // update preview immediately
+    const prev = document.getElementById(`qe-img-preview-${oIdx}`);
+    prev.innerHTML = `<img src="${e.target.result}" alt="" style="width:100%;height:100%;object-fit:cover">`;
+    // add remove button
+    const row = prev.parentElement;
+    const existing = row.querySelector('.btn-remove-img');
+    if (!existing) {
+      const btn = document.createElement('button');
+      btn.className = 'btn-remove-img';
+      btn.textContent = '✕ הסר';
+      btn.onclick = () => removeImg(qIdx, oIdx);
+      row.appendChild(btn);
+    }
+    showToast('תמונה הועלתה ✓');
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeImg(qIdx, oIdx) {
+  QUESTIONS[qIdx].options[oIdx].img = null;
+  renderQEditPanel(qIdx);
+  showToast('תמונה הוסרה');
+}
+
+function saveEdits() {
+  // Save general
+  document.getElementById('edit-badge').textContent = document.getElementById('fe-badge').value;
+  document.getElementById('edit-intro-desc').textContent = document.getElementById('fe-intro-desc').value;
+  document.getElementById('edit-start-btn').textContent = document.getElementById('fe-start-btn').value + ' ←';
+
+  Object.keys(STYLES).forEach(key => {
+    const el = document.getElementById('fe-style-desc-'+key);
+    if (el) STYLES[key].desc = el.value;
+  });
+
+  // Save active question
+  if (activeEditorQ !== null) {
+    const q = QUESTIONS[activeEditorQ];
+    const catEl = document.getElementById('qe-cat');
+    const titleEl = document.getElementById('qe-title');
+    if (catEl) q.category = catEl.value;
+    if (titleEl) q.title = titleEl.value;
+    q.options.forEach((opt, oi) => {
+      const nameEl = document.getElementById(`qe-opt-name-${oi}`);
+      const descEl = document.getElementById(`qe-opt-desc-${oi}`);
+      if (nameEl) opt.name = nameEl.value;
+      if (descEl) opt.desc = descEl.value;
+    });
+  }
+
+  // Re-render if on question screen
+  const qScreen = document.getElementById('screen-question');
+  if (qScreen.classList.contains('active')) renderQuestion();
+  populateQList();
+  showToast('השינויים נשמרו ✓');
+}
+
+// ── EXPORT ───────────────────────────────────────────────────────────
+function exportHTML() {
+  // Make sure any unsaved edits in the editor are applied first
+  saveEdits();
+
+  // Take a snapshot of the current page
+  const docClone = document.documentElement.cloneNode(true);
+
+  // Reset to intro screen + close editor in the exported copy
+  docClone.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const introClone = docClone.querySelector('#screen-intro');
+  if (introClone) introClone.classList.add('active');
+  const overlayClone = docClone.querySelector('#editorOverlay');
+  if (overlayClone) overlayClone.classList.remove('open');
+  // Always reset the toast so it never gets stuck open in exported file
+  const toastClone = docClone.querySelector('#toast');
+  if (toastClone) { toastClone.classList.remove('show'); toastClone.textContent = ''; }
+  const editBtnClone = docClone.querySelector('#btnOpenEditor');
+  if (editBtnClone) editBtnClone.classList.remove('active');
+  const progFill = docClone.querySelector('#progressFill');
+  if (progFill) progFill.style.width = '0%';
+  const progText = docClone.querySelector('#progressText');
+  if (progText) progText.textContent = '';
+  // Clear question/result panels (they'll be re-rendered on load anyway)
+  const optGrid = docClone.querySelector('#optionsGrid');
+  if (optGrid) optGrid.innerHTML = '';
+
+  // Replace the data definitions in the script with the current (edited) state
+  const scriptEl = docClone.querySelector('script');
+  let scriptText = scriptEl.textContent;
+
+  const stylesJSON = JSON.stringify(STYLES, null, 2);
+  const questionsJSON = JSON.stringify(QUESTIONS, null, 2);
+
+  scriptText = scriptText.replace(
+    /const STYLES = \{[\s\S]*?\n\};/,
+    'const STYLES = ' + stylesJSON + ';'
+  );
+  scriptText = scriptText.replace(
+    /const QUESTIONS = \[[\s\S]*?\n\];/,
+    'const QUESTIONS = ' + questionsJSON + ';'
+  );
+
+  scriptEl.textContent = scriptText;
+
+  // Serialize full document
+  const htmlString = '<!DOCTYPE html>\n' + docClone.outerHTML;
+  const blob = new Blob([htmlString], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'סגנון_אדריכלי.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  showToast('הקובץ יוצא ✓ שמרו אותו לשליחה ללקוחות');
+}
+
+// ── REPORT ───────────────────────────────────────────────────────────
+const STYLE_HEB = {
+  desert: 'מדברי / ים תיכוני',
+  rural:  'כפרי',
+  modern: 'מודרני',
+  scandi: 'סקנדינבי'
+};
+const STYLE_COLORS = {
+  desert: '#C8956C', rural: '#7A9E6B', modern: '#4A6FA5', scandi: '#9B8EA8'
+};
+const STYLE_LIGHT = {
+  desert: '#F5EDE4', rural: '#EEF5EA', modern: '#E8EFF8', scandi: '#F2EFF5'
+};
+const STYLE_EMOJI = {
+  desert: '🏺', rural: '🌿', modern: '◻️', scandi: '🌲'
+};
+
+function openReport() {
+  // Compute scores from answers
+  const scores = {desert:0, rural:0, modern:0, scandi:0};
+  Object.values(answers).forEach(s => { if (scores[s] !== undefined) scores[s]++; });
+  const total = Object.values(scores).reduce((a,b)=>a+b,0);
+  const winner = Object.entries(scores).sort((a,b)=>b[1]-a[1])[0][0];
+  const winnerPct = Math.round(scores[winner]/total*100);
+  const winnerColor = STYLE_COLORS[winner];
+
+  // Distribution bars
+  const barsHTML = Object.entries(scores)
+    .sort((a,b)=>b[1]-a[1])
+    .map(([sk,cnt]) => {
+      const pct = Math.round(cnt/total*100);
+      return `<div class="report-bar-row">
+        <div class="report-bar-label">${STYLE_EMOJI[sk]} ${STYLE_HEB[sk]}</div>
+        <div class="report-bar-track"><div class="report-bar-fill" style="width:${pct}%;background:${STYLE_COLORS[sk]}"></div></div>
+        <div class="report-bar-pct">${pct}%</div>
+      </div>`;
+    }).join('');
+
+  // Questions
+  const questionsHTML = QUESTIONS.map((q, i) => {
+    const chosen = answers[i] || '';
+    const col = STYLE_COLORS[chosen] || '#999';
+    const light = STYLE_LIGHT[chosen] || '#F5F5F5';
+    const imgUrl = q.options.find(o => o.style === chosen)?.img || '';
+    const imgEl = imgUrl
+      ? `<img class="report-q-img" src="${imgUrl}" onerror="this.style.display='none'">`
+      : `<div class="report-q-no-img">${STYLE_EMOJI[chosen]||''}</div>`;
+    return `<div class="report-q-row">
+      <div class="report-q-bar" style="background:${col}"></div>
+      ${imgEl}
+      <div class="report-q-content">
+        <div class="report-q-cat">${q.category}</div>
+        <div class="report-q-title">${q.title}</div>
+        <div class="report-q-chosen" style="color:${col};background:${light}">
+          ${STYLE_EMOJI[chosen]||''} ${STYLE_HEB[chosen]||chosen}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Lead name if available
+  const leadName = document.getElementById('leadName')?.value || '';
+  const nameText = leadName ? ` — ${leadName}` : '';
+
+  document.getElementById('reportPage').innerHTML = `
+    <div class="report-header">
+      <div class="report-badge">דוח אישי</div>
+      <h2>סגנון אדריכלי${nameText}</h2>
+      <p>על בסיס ${total} תשובות בשאלון</p>
+    </div>
+    <div class="report-winner" style="background:${winnerColor}">
+      <div class="report-winner-label">הסגנון המוביל שלך</div>
+      <div class="report-winner-name">${STYLE_EMOJI[winner]} ${STYLE_HEB[winner]}</div>
+      <div class="report-winner-pct">${winnerPct}% מהתשובות שלך</div>
+    </div>
+    <div class="report-bars">
+      <div class="report-section-title">התפלגות הסגנונות</div>
+      ${barsHTML}
+    </div>
+    <div class="report-section-title">הבחירות שלך — שאלה אחר שאלה</div>
+    <div class="report-questions">${questionsHTML}</div>
+    <div class="report-actions">
+      <button class="report-print" onclick="window.print()">🖨️ הדפסה / שמירה כ-PDF</button>
+      <button class="report-close" onclick="closeReport()">סגירה ×</button>
+    </div>`;
+
+  document.getElementById('reportOverlay').classList.add('open');
+  document.getElementById('reportOverlay').scrollTop = 0;
+}
+
+function closeReport() {
+  document.getElementById('reportOverlay').classList.remove('open');
+}
+
+</script>
+
+
+
+</body></html>
